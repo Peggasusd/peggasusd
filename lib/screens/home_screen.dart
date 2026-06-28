@@ -103,9 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Token Balances
             ...tokenBalances.entries.map((entry) {
-              final metadata = _sdk.tokensMetadata?[entry.key];
-              final ticker = metadata?.ticker ?? entry.key;
-              final decimals = metadata?.decimals ?? 0;
+              final meta = entry.value.tokenMetadata;
+              final ticker = meta?.ticker ?? entry.key;
+              final decimals = meta?.decimals ?? 0;
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),

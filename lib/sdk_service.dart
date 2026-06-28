@@ -38,8 +38,7 @@ class SdkService {
   GetInfoResponse? _lastInfo;
   GetInfoResponse? get lastInfo => _lastInfo;
 
-  Map<String, TokensMetadata>? _tokensMetadata;
-  Map<String, TokensMetadata>? get tokensMetadata => _tokensMetadata;
+  // Token metadata is accessed via lastInfo.tokenBalances[tokenId].tokenMetadata
 
   Future<bool> hasStoredMnemonic() async {
     final mnemonic = await _storage.read(key: _mnemonicKey);
@@ -90,7 +89,6 @@ class SdkService {
     _listenToEvents();
     _initialized = true;
     await refreshInfo();
-    await refreshTokensMetadata();
     _logger.info('SDK initialized');
   }
 
@@ -113,23 +111,6 @@ class SdkService {
       _infoController.add(info);
     } catch (e) {
       _logger.severe('Failed to refresh info: $e');
-    }
-  }
-
-  Future<void> refreshTokensMetadata() async {
-    if (_sdk == null) return;
-    try {
-      final tokenIds = _lastInfo?.tokenBalances.keys.toList();
-      if (tokenIds == null || tokenIds.isEmpty) return;
-      final metaResponse = await _sdk!.getTokensMetadata(
-        request: GetTokensMetadataRequest(tokenIdentifiers: tokenIds),
-      );
-      _tokensMetadata = {};
-      for (final meta in metaResponse.tokensMetadata) {
-        _tokensMetadata![meta.identifier] = meta;
-      }
-    } catch (e) {
-      _logger.severe('Failed to refresh token metadata: $e');
     }
   }
 
@@ -270,7 +251,7 @@ class SdkService {
 
   // ─── Lightning Address ────────────────────────────────────────────────────
 
-  Future<String?> getLightningAddress() async {
+  Future<LightningAddressInfo?> getLightningAddress() async {
     try {
       return await _sdk!.getLightningAddress();
     } catch (_) {

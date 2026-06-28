@@ -81,7 +81,11 @@ class _SendScreenState extends State<SendScreen> {
   String _describeInput(InputType type) {
     if (type is InputType_Bolt11Invoice) {
       final amt = type.field0.amountMsat;
-      return 'Bolt11 Invoice${amt != null ? ' - ${amt ~/ 1000} SAT' : ''}';
+      if (amt != null) {
+        final sats = amt ~/ BigInt.from(1000);
+        return 'Bolt11 Invoice - $sats SAT';
+      }
+      return 'Bolt11 Invoice';
     }
     if (type is InputType_LnurlPay) return 'LNURL-Pay';
     if (type is InputType_LnurlWithdraw) return 'LNURL-Withdraw';
