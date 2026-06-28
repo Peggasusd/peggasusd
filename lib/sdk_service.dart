@@ -65,6 +65,7 @@ class SdkService {
     required String mnemonic,
     required String apiKey,
     String? storageDirPath,
+    bool customOperators = true,
   }) async {
     if (_initialized) return;
 
@@ -74,8 +75,12 @@ class SdkService {
     _mnemonic = mnemonic;
 
     final seed = Seed.mnemonic(mnemonic: mnemonic, passphrase: null);
-    final config = defaultConfig(network: Network.mainnet)
+    var config = defaultConfig(network: Network.mainnet)
         .copyWith(apiKey: apiKey);
+
+    if (customOperators) {
+      config = config.copyWith(sparkConfig: _customSparkConfig());
+    }
 
     final dir = await getApplicationDocumentsDirectory();
     final storageDir = storageDirPath ?? '${dir.path}/spark_sdk';
@@ -90,6 +95,50 @@ class SdkService {
     _initialized = true;
     await refreshInfo();
     _logger.info('SDK initialized');
+  }
+
+  SparkConfig _customSparkConfig() {
+    return SparkConfig(
+      coordinatorIdentifier:
+          '0000000000000000000000000000000000000000000000000000000000000000',
+      threshold: 2,
+      signingOperators: _customOperators(),
+      sspConfig: _customSspConfig(),
+      expectedWithdrawBondSats: BigInt.from(10000),
+      expectedWithdrawRelativeBlockLocktime: BigInt.from(1000),
+    );
+  }
+
+  List<SparkSigningOperator> _customOperators() {
+    return [
+      SparkSigningOperator(
+        id: 1,
+        identifier:
+            '0000000000000000000000000000000000000000000000000000000000000002',
+        address: 'https://spark-operator.breez.technology',
+        identityPublicKey:
+            '03e625e9768651c9be268e287245cc33f96a68ce9141b0b4769205db027ee8ed77',
+        caCertPem: null,
+      ),
+      SparkSigningOperator(
+        id: 2,
+        identifier:
+            '0000000000000000000000000000000000000000000000000000000000000003',
+        address: 'https://2.spark.flashnet.xyz',
+        identityPublicKey:
+            '022eda13465a59205413086130a65dc0ed1b8f8e51937043161f8be0c369b1a410',
+        caCertPem: null,
+      ),
+    ];
+  }
+
+  SparkSspConfig _customSspConfig() {
+    return SparkSspConfig(
+      baseUrl: 'https://api.lightspark.com',
+      identityPublicKey:
+          '023e33e2920326f64ea31058d44777442d97d7d5cbfcf54e3060bc1695e5261c93',
+      schemaEndpoint: null,
+    );
   }
 
   void _listenToEvents() {
