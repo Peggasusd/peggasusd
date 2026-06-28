@@ -36,12 +36,13 @@ jobs:
         run: flutter pub get
 
       - name: Build APK (arm64)
-        run: flutter build apk --target-platform android-arm64 --release
-        env:
-          GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx4g
+        run: |
+          flutter build apk --target-platform android-arm64 --release
+          echo "=== Build output files ==="
+          find build/app -name "*.apk" -type f
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: peggasusd-arm64
-          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          path: build/app/outputs/flutter-apk/*.apk
