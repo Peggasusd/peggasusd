@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'app_config.dart';
+import 'screens/welcome_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/onboard_screen.dart';
 import 'sdk_service.dart';
 
 void main() {
@@ -21,10 +21,11 @@ class PeggasusdApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.indigo,
-          brightness: Brightness.light,
+          seedColor: const Color(0xFFD4A574),
+          brightness: Brightness.dark,
         ),
         useMaterial3: true,
+        // fontFamily: 'Plus Jakarta Sans',
       ),
       home: const StartupScreen(),
     );
@@ -52,16 +53,10 @@ class _StartupScreenState extends State<StartupScreen> {
 
     if (hasWallet) {
       final mnemonic = await sdk.loadMnemonic();
-      final apiKey = AppConfig.hasApiKey
-          ? AppConfig.breezApiKey
-          : await sdk.loadApiKey();
-
-      if (mnemonic != null && apiKey != null) {
+      if (mnemonic != null && AppConfig.hasApiKey) {
         try {
-          await sdk.init(mnemonic: mnemonic, apiKey: apiKey);
-        } catch (_) {
-          // init failed, show onboard screen to retry
-        }
+          await sdk.init(mnemonic: mnemonic, apiKey: AppConfig.breezApiKey);
+        } catch (_) {}
       }
 
       if (!mounted) return;
@@ -70,7 +65,7 @@ class _StartupScreenState extends State<StartupScreen> {
       );
     } else {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const OnboardScreen()),
+        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
       );
     }
   }

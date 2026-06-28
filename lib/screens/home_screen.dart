@@ -5,6 +5,9 @@ import '../sdk_service.dart';
 import 'history_screen.dart';
 import 'receive_screen.dart';
 import 'send_screen.dart';
+import 'settings_screen.dart';
+import 'about_screen.dart';
+import 'welcome_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,8 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final SdkService _sdk = SdkService.instance;
   GetInfoResponse? _info;
   List<Payment> _recentPayments = [];
-  bool _loading = true;
   bool _showUsd = false;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -28,15 +31,15 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) setState(() => _info = info);
     });
     _sdk.eventStream.listen((event) {
-      if (event is SdkEvent_Synced) _loadPayments();
-      if (event is SdkEvent_PaymentSucceeded) _loadPayments();
+      if (event is SdkEvent_Synced || event is SdkEvent_PaymentSucceeded) {
+        _loadPayments();
+      }
     });
   }
 
   Future<void> _loadData() async {
     _info = _sdk.lastInfo;
     await _loadPayments();
-    if (mounted) setState(() => _loading = false);
   }
 
   Future<void> _loadPayments() async {
@@ -63,17 +66,32 @@ class _HomeScreenState extends State<HomeScreen> {
     return f.format(double.parse(formatted));
   }
 
+  String _formatSatsFull(BigInt sats) {
+    final f = NumberFormat('#,###');
+    return '${f.format(sats.toInt())} sats';
+  }
+
+  void _openDrawer() {
+    _scaffoldKey.currentState?.openDrawer();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sats = _info?.balanceSats ?? BigInt.zero;
     final tokenBalances = _info?.tokenBalances ?? {};
-    final firstToken = tokenBalances.entries.isNotEmpty ? tokenBalances.entries.first : null;
+    final firstToken =
+        tokenBalances.entries.isNotEmpty ? tokenBalances.entries.first : null;
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('PEGGASUSD'),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: _openDrawer,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -81,47 +99,51 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      drawer: _buildDrawer(theme),
       body: RefreshIndicator(
         onRefresh: _loadData,
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
             const SizedBox(height: 20),
-
             // Balance card - tap to toggle SAT/USD
             GestureDetector(
               onTap: () => setState(() => _showUsd = !_showUsd),
               child: Card(
-                elevation: 2,
+                elevation: 0,
+                color: theme.colorScheme.surfaceContainerHighest,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
+                  borderRadius: BorderRadius.circular(20),
+                ),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 32, horizontal: 24),
                   child: Column(
                     children: [
                       Text(
                         _showUsd ? 'USD Balance' : 'Bitcoin Balance',
                         style: theme.textTheme.titleMedium
-                            ?.copyWith(color: Colors.grey[600]),
+                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                       ),
                       const SizedBox(height: 12),
                       if (_showUsd && firstToken != null) ...[
                         Text(
                           _formatToken(
-                              firstToken.value.balance,
-                              firstToken.value.tokenMetadata?.decimals ?? 0),
+                            firstToken.value.balance,
+                            firstToken.value.tokenMetadata.decimals,
+                          ),
                           style: theme.textTheme.headlineLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          firstToken.value.tokenMetadata?.ticker ?? 'USD',
+                          firstToken.value.tokenMetadata.ticker,
                           style: theme.textTheme.titleMedium
-                              ?.copyWith(color: Colors.grey[600]),
+                              ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                         ),
                       ] else ...[
                         Text(
-                          '${_formatSats(sats)}',
+                          _formatSats(sats),
                           style: theme.textTheme.headlineLarge
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
@@ -129,38 +151,42 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                                 fontSize: 16, color: Colors.grey)),
                       ],
+                      const SizedBox(height: 12),
+                      Text(
+                        _formatSatsFull(sats),
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      ),
                       const SizedBox(height: 4),
                       Text(
-                        'tap to switch',
+                        'toca para cambiar',
                         style: theme.textTheme.bodySmall
-                            ?.copyWith(color: Colors.grey[400]),
+                            ?.copyWith(color: Colors.grey[500]),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
             // Send / Receive buttons
             Row(
               children: [
                 Expanded(
                   child: SizedBox(
                     height: 56,
-                    child: ElevatedButton.icon(
+                    child: FilledButton.icon(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                             builder: (_) => const ReceiveScreen()),
                       ),
                       icon: const Icon(Icons.qr_code),
-                      label: const Text('Receive'),
-                      style: ElevatedButton.styleFrom(
+                      label: const Text('Recibir'),
+                      style: FilledButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                     ),
                   ),
@@ -169,31 +195,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: SizedBox(
                     height: 56,
-                    child: ElevatedButton.icon(
+                    child: FilledButton.icon(
                       onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const SendScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const SendScreen()),
                       ),
                       icon: const Icon(Icons.send_rounded),
-                      label: const Text('Send'),
-                      style: ElevatedButton.styleFrom(
+                      label: const Text('Enviar'),
+                      style: FilledButton.styleFrom(
                         backgroundColor: theme.colorScheme.secondary,
                         foregroundColor: theme.colorScheme.onSecondary,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-
             const SizedBox(height: 32),
-
             // Recent payments header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Recent Payments',
+                Text('Pagos recientes',
                     style: theme.textTheme.titleMedium
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 TextButton(
@@ -201,16 +226,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     MaterialPageRoute(
                         builder: (_) => const HistoryScreen()),
                   ),
-                  child: const Text('View all'),
+                  child: const Text('Ver todo'),
                 ),
               ],
             ),
-
             if (_recentPayments.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
                 child: Center(
-                  child: Text('No payments yet',
+                  child: Text('No hay pagos aún',
                       style: TextStyle(color: Colors.grey)),
                 ),
               )
@@ -219,6 +243,162 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDrawer(ThemeData theme) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              color: theme.colorScheme.surfaceContainerHighest,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.bolt,
+                      size: 40, color: theme.colorScheme.primary),
+                  const SizedBox(height: 12),
+                  Text('PEGGASUSD',
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text('Lightning Wallet para Cuba',
+                      style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 13)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: const Text('Idioma'),
+              subtitle: const Text('Español'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Acerca de'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AboutScreen()),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.key),
+              title: const Text('Frase de recuperación'),
+              subtitle: const Text('Ver frase semilla'),
+              onTap: () => _showSeedDialog(context),
+            ),
+            const Spacer(),
+            const Divider(),
+            ListTile(
+              leading: Icon(Icons.logout, color: theme.colorScheme.error),
+              title: Text('Cerrar sesión',
+                  style: TextStyle(color: theme.colorScheme.error)),
+              onTap: () => _confirmLogout(context),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSeedDialog(BuildContext context) {
+    final mnemonic = _sdk.mnemonic;
+    if (mnemonic == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay frase de recuperación disponible')),
+      );
+      return;
+    }
+    final words = mnemonic.split(' ');
+    Navigator.pop(context); // close drawer
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Frase de recuperación'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Estas palabras son la única forma de recuperar tus fondos.',
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            ...List.generate(12, (i) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      child: Text('${i + 1}.',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          )),
+                    ),
+                    Text(words[i], style: const TextStyle(fontSize: 15)),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    Navigator.pop(context); // close drawer
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cerrar sesión'),
+        content: const Text(
+          '¿Estás seguro? Se eliminarán los datos de la wallet '
+          'de este dispositivo. Asegúrate de tener tu frase de '
+          'recuperación guardada.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _doLogout();
+            },
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error),
+            child: const Text('Cerrar sesión'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _doLogout() async {
+    await _sdk.disconnect();
+    await _sdk.clearMnemonic();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+      (route) => false,
     );
   }
 }
@@ -236,8 +416,11 @@ class _PaymentTile extends StatelessWidget {
     final status = payment.status;
     final isCompleted = status == PaymentStatus.completed;
     final isPending = status == PaymentStatus.pending;
-    final statusColor =
-        isCompleted ? Colors.green : isPending ? Colors.orange : Colors.red;
+    final statusColor = isCompleted
+        ? Colors.green
+        : isPending
+            ? Colors.orange
+            : Colors.red;
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -245,10 +428,14 @@ class _PaymentTile extends StatelessWidget {
         backgroundColor: color.withValues(alpha: 0.15),
         child: Icon(icon, color: color, size: 20),
       ),
-      title: Text(isSend ? 'Sent' : 'Received',
+      title: Text(isSend ? 'Enviado' : 'Recibido',
           style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: Text(
-        isCompleted ? 'Completed' : isPending ? 'Pending' : 'Failed',
+        isCompleted
+            ? 'Completado'
+            : isPending
+                ? 'Pendiente'
+                : 'Fallido',
         style: TextStyle(color: statusColor, fontSize: 13),
       ),
       trailing: Text(

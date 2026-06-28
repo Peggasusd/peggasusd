@@ -46,7 +46,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: ListView.separated(
                     padding: const EdgeInsets.all(8),
                     itemCount: _payments.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, i) {
                       final p = _payments[i];
                       final isSend = p.paymentType == PaymentType.send;

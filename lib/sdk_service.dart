@@ -114,6 +114,11 @@ class SdkService {
     }
   }
 
+  Future<void> clearMnemonic() async {
+    await _storage.delete(key: _mnemonicKey);
+    await _storage.delete(key: _apiKeyKey);
+  }
+
   Future<void> disconnect() async {
     await _eventSubscription?.cancel();
     await _sdk?.disconnect();

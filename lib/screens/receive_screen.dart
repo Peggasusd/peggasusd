@@ -1,4 +1,3 @@
-import 'package:breez_sdk_spark_flutter/breez_sdk_spark.dart';
 import 'package:flutter/material.dart';
 import '../sdk_service.dart';
 
