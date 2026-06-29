@@ -19,7 +19,7 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build web app
         run: npm run build
@@ -27,7 +27,7 @@ jobs:
           VITE_BREEZ_API_KEY: ${{ secrets.BREEZ_API_KEY }}
 
       - name: Add Android platform
-        run: npx cap add android
+        run: npx cap add android --no-telemetry
 
       - name: Sync Capacitor
         run: npx cap sync android
