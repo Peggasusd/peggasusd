@@ -27,7 +27,7 @@ jobs:
           VITE_BREEZ_API_KEY: ${{ secrets.BREEZ_API_KEY }}
 
       - name: Add Android platform
-        run: npx cap add android --no-telemetry
+        run: npx cap add android
 
       - name: Sync Capacitor
         run: npx cap sync android
