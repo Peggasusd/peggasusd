@@ -1,17 +1,69 @@
-# peggasusd
+# Glow Web App
 
-A new Flutter project.
+A PWA app showing how to implement [Breez SDK](https://sdk-doc-spark.breez.technology/) with WebAssembly.
+
+See it in action [here](https://glow-app.co).
+
+## Overview
+
+Built with React, this demo app showcases best practices for integrating Lightning in a web environment using the Breez SDK’s WebAssembly bindings. It enables users to:
+
+- Send payments via various protocols such as: Lightning address, LNURL-Pay, Bolt11, BTC address, Spark address
+- Receive payments via various protocols such as: Lightning address, LNURL-Pay, Bolt11, BTC address
+
+## Technologies Used
+
+- [Breez SDK](https://sdk-doc-spark.breez.technology/) for all the bitcoin functionality
+- React with TypeScript
+- Tailwind CSS for styling
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Clone the repository
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+git clone https://github.com/breez/glow-web.git
+cd glow-web
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+### Install dependencies
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+npm install
+```
+
+### Set up environment variables
+
+1. Copy the example environment file:
+
+```bash
+cp example.env .env.local
+```
+
+2. Edit `.env.local` and add your Breez API key (required):
+
+```
+VITE_BREEZ_API_KEY="your_breez_api_key_here"
+```
+
+See `example.env` for all available configuration options.
+
+### Start the development server
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+## Building for Production
+
+```bash
+npm run build
+```
+
+The build output will be in the `dist` directory.
+
+## Security Note
+
+If you don’t use a passkey (recommended), your recovery phrase is stored in `localStorage` which is not a secure storage mechanism. Any JavaScript running in the browser (including XSS attacks or malicious extensions) can access it, potentially compromising your funds.
