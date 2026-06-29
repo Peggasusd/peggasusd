@@ -249,7 +249,6 @@ const AppContent: React.FC = () => {
           }}
           onOpenSettings={() => setUserScreen('settings')}
           onOpenBackup={() => setUserScreen('backup')}
-          network={sdk.config?.network}
           onDepositChanged={sdk.fetchUnclaimedDeposits}
         />
       );

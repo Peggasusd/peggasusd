@@ -34,6 +34,7 @@ import {
   setPendingSwitchFromCredentialId,
 } from '../services/passkeyService';
 import { secureStorage, deviceOnlyStorage, SecureStorageError } from '../services/secureStorage';
+import { formatError } from '../utils/formatError';
 
 
 // ============================================

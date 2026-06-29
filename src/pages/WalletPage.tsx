@@ -5,7 +5,7 @@ import { logger, LogCategory } from '@/services/logger';
 import CollapsingWalletHeader from '../components/CollapsingWalletHeader';
 import SideMenu from '../components/SideMenu';
 import TransactionList from '../components/TransactionList';
-import { GetInfoResponse, Payment, DepositInfo, Network } from '@breeztech/breez-sdk-spark';
+import { GetInfoResponse, Payment, DepositInfo } from '@breeztech/breez-sdk-spark';
 import { ArrowUpIcon, QrCodeIcon, ArrowDownIcon } from '../components/Icons';
 import { mergeDepositsWithTransactions, ExtendedPayment, isUnclaimedDepositPayment } from '@/utils/depositHelpers';
 import SendPaymentDialog from '../features/send/SendPaymentDialog';
@@ -46,7 +46,6 @@ const WalletPage: React.FC<WalletPageProps> = ({
   onOpenGetRefund,
   onOpenSettings,
   onOpenBackup,
-  network,
   onDepositChanged,
 }) => {
   const wallet = useWallet();
