@@ -21,7 +21,6 @@ export interface UseQrScannerReturn {
   startScanning: () => Promise<void>;
   stopScanning: () => void;
   toggleCamera: () => void;
-  requestPermission: () => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -156,15 +155,6 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
     }
   }, [facingMode]);
 
-  const requestPermission = useCallback(async (): Promise<boolean> => {
-    try {
-      await navigator.mediaDevices.getUserMedia({ video: true });
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
   return {
     videoRef,
     error,
@@ -176,7 +166,6 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
     startScanning,
     stopScanning,
     toggleCamera,
-    requestPermission,
     clearError,
   };
 };
