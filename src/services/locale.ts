@@ -23,6 +23,7 @@ export type TranslationKey =
   | 'backup'
   | 'settings'
   | 'about'
+  | 'getRefund'
   | 'logout'
   | 'cancel'
   | 'confirm'
@@ -138,7 +139,6 @@ export type TranslationKey =
   | 'settings.version'
   | 'settings.dev'
   | 'settings.devModeTaps'
-  | 'settings.moreTapsTo'
   | 'settings.enable'
   | 'settings.disable'
   | 'settings.e.g30'
@@ -459,6 +459,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     backup: 'Backup',
     settings: 'Settings',
     about: 'About',
+    getRefund: 'Get Refund',
     logout: 'Logout',
     cancel: 'Cancel',
     confirm: 'Confirm',
@@ -894,6 +895,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     backup: 'Copia de seguridad',
     settings: 'Configuración',
     about: 'Acerca de',
+    getRefund: 'Obtener reembolso',
     logout: 'Cerrar sesión',
     cancel: 'Cancelar',
     confirm: 'Confirmar',
