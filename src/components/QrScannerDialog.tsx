@@ -1,11 +1,10 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react';
-import QrScanner from 'qr-scanner/qr-scanner.legacy.min.js';
+import React, { useEffect, useCallback } from 'react';
 import { BottomSheetContainer, FloatingIconButton } from './ui';
 import { useQrScanner } from '../hooks/useQrScanner';
 import { logger, LogCategory } from '@/services/logger';
-import { formatError } from '@/utils/formatError';
-import { CameraFlipIcon, ImageIcon, AlertTriangleIcon } from './Icons';
+import { CameraFlipIcon, AlertTriangleIcon } from './Icons';
 import { useLatest } from '../hooks/useLatest';
+import { t } from '@/services/locale';
 
 interface QrScannerDialogProps {
   isOpen: boolean;
@@ -18,37 +17,9 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
   // since this dialog is mounted with fullHeight — isFullScreen is true
   // for the whole open lifetime, so both bars get the spark-surface push.
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [galleryError, setGalleryError] = useState<string | null>(null);
-
   const handleScan = useCallback((data: string) => {
     onScan(data);
     onClose();
-  }, [onScan, onClose]);
-
-  const handleGalleryPick = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setGalleryError(null);
-    try {
-      logger.info(LogCategory.UI, 'Decoding QR from gallery image', {
-        size: file.size,
-        type: file.type,
-      });
-      const result = await QrScanner.scanImage(file);
-      onScan(result);
-      onClose();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'No QR code found in image';
-      logger.error(LogCategory.UI, 'Gallery QR decode failed', {
-        error: formatError(err),
-        message: msg,
-      });
-      setGalleryError(msg);
-      setTimeout(() => setGalleryError(null), 4000);
-    }
-    // Reset so the same file can be re-selected
-    if (fileInputRef.current) fileInputRef.current.value = '';
   }, [onScan, onClose]);
 
   const {
@@ -176,7 +147,7 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
               <div className="absolute inset-0 flex items-center justify-center bg-spark-surface/70">
                 <div className="text-center text-white p-4">
                   <div className="animate-spin rounded-full h-10 w-10 border-2 border-spark-primary border-t-transparent mx-auto mb-3"></div>
-                  <p className="text-sm text-spark-text-secondary">Initializing camera...</p>
+                  <p className="text-sm text-spark-text-secondary">{t('scanner.initializing')}</p>
                 </div>
               </div>
             )}
@@ -188,11 +159,11 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
                     <AlertTriangleIcon size="xl" className="text-spark-error" />
                   </div>
                   <p className="text-sm mb-2 font-medium">
-                    {errorType === 'permission' ? 'Camera permission denied' : 'Camera not available'}
+                    {errorType === 'permission' ? t('scanner.cameraPermissionDenied') : t('scanner.notAvailable')}
                   </p>
                   {errorType === 'permission' ? (
                     <p className="text-xs text-spark-text-muted mb-4">
-                      Please enable camera access in your device settings to scan QR codes.
+                      {t('scanner.cameraPermissionDeniedDesc')}
                     </p>
                   ) : (
                     <p className="text-xs text-spark-text-muted mb-4">{error}</p>
@@ -201,7 +172,7 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
                     onClick={() => { clearError(); startScanning(); }}
                     className="px-6 py-2 bg-spark-primary text-black rounded-xl font-medium text-sm hover:brightness-110 transition-all"
                   >
-                    Try Again
+                    {t('tryAgain')}
                   </button>
                 </div>
               </div>
@@ -220,30 +191,6 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
               }
             />
           )}
-
-          {/* Gallery picker button (top right of the viewport). */}
-          <FloatingIconButton
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute top-4 right-4 z-20"
-            aria-label="Pick image from gallery"
-            icon={
-              <ImageIcon />
-            }
-          />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleGalleryPick}
-          />
-
-          {/* Gallery error toast */}
-          {galleryError && (
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-spark-error/90 text-white text-sm px-4 py-2 rounded-lg backdrop-blur-sm z-30">
-              {galleryError}
-            </div>
-          )}
         </div>
 
         {/* Bottom controls — match the rest of the app's bottom chrome
@@ -252,13 +199,13 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
         <div className="bg-spark-surface/80 backdrop-blur-md">
           <div className="p-6">
             <p className="text-spark-text-secondary text-sm text-center mb-4">
-              Point camera at QR code
+              {t('scanner.pointCamera')}
             </p>
             <button
               onClick={handleClose}
               className="w-full py-3 border border-spark-border text-spark-text-primary rounded-xl font-medium hover:bg-white/10 transition-colors"
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
         </div>
