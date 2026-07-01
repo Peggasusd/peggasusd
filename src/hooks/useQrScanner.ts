@@ -77,6 +77,11 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
         // hasCamera can throw if getUserMedia fails — ignore, proceed
       }
 
+      // Force worker-based engine instead of native BarcodeDetector.
+      // The native BarcodeDetector API in Android WebView is unreliable
+      // across different OS/WebView versions.
+      (QrScanner as any)._disableBarcodeDetector = true;
+
       qrScannerRef.current = new QrScanner(
         videoRef.current,
         (result) => {
