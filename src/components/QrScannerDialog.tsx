@@ -3,6 +3,7 @@ import QrScanner from 'qr-scanner';
 import { BottomSheetContainer, FloatingIconButton } from './ui';
 import { useQrScanner } from '../hooks/useQrScanner';
 import { logger, LogCategory } from '@/services/logger';
+import { formatError } from '@/utils/formatError';
 import { CameraFlipIcon, ImageIcon, AlertTriangleIcon } from './Icons';
 import { useLatest } from '../hooks/useLatest';
 
@@ -30,12 +31,21 @@ const QrScannerDialog: React.FC<QrScannerDialogProps> = ({ isOpen, onClose, onSc
     if (!file) return;
     setGalleryError(null);
     try {
+      logger.info(LogCategory.UI, 'Decoding QR from gallery image', {
+        size: file.size,
+        type: file.type,
+      });
       const result = await QrScanner.scanImage(file);
       onScan(result);
       onClose();
-    } catch {
-      setGalleryError('No QR code found in image');
-      setTimeout(() => setGalleryError(null), 3000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'No QR code found in image';
+      logger.error(LogCategory.UI, 'Gallery QR decode failed', {
+        error: formatError(err),
+        message: msg,
+      });
+      setGalleryError(msg);
+      setTimeout(() => setGalleryError(null), 4000);
     }
     // Reset so the same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = '';

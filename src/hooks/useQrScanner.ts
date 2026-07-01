@@ -3,6 +3,12 @@ import QrScanner from 'qr-scanner';
 import { logger, LogCategory } from '@/services/logger';
 import { formatError } from '@/utils/formatError';
 
+// Force the Web Worker QR engine globally. The native BarcodeDetector API
+// on Android WebView is unreliable — it reports support but often fails to
+// detect QR codes. This flag applies to both camera scanning (start()) and
+// gallery image scanning (scanImage()).
+(QrScanner as any)._disableBarcodeDetector = true;
+
 export type FacingMode = 'environment' | 'user';
 
 export interface UseQrScannerOptions {
@@ -76,11 +82,6 @@ export const useQrScanner = ({ onScan, onError }: UseQrScannerOptions): UseQrSca
       } catch {
         // hasCamera can throw if getUserMedia fails — ignore, proceed
       }
-
-      // Force worker-based engine instead of native BarcodeDetector.
-      // The native BarcodeDetector API in Android WebView is unreliable
-      // across different OS/WebView versions.
-      (QrScanner as any)._disableBarcodeDetector = true;
 
       qrScannerRef.current = new QrScanner(
         videoRef.current,
