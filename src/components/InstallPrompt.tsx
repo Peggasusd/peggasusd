@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import { DownloadIcon, CloseIcon } from './Icons';
+import { t } from '@/services/locale';
 
 const INSTALL_PROMPT_DISMISSED_KEY = 'install_prompt_dismissed';
 
@@ -95,10 +96,10 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ onClose }) => {
 
           <div className="flex-1 min-w-0">
             <h3 className="font-display font-semibold text-spark-text-primary text-sm">
-              Install PEGGASUSD
+              {t('install.title')}
             </h3>
             <p className="text-xs text-spark-text-muted mt-1">
-              Add to your home screen for quick access and a better experience.
+              {t('install.description')}
             </p>
 
             <div className="flex gap-2 mt-3">
@@ -107,14 +108,14 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ onClose }) => {
                 disabled={isInstalling}
                 className="flex-1 px-3 py-2 bg-spark-primary text-white text-sm font-medium rounded-xl hover:bg-spark-primary-light transition-colors disabled:opacity-50"
               >
-                {isInstalling ? 'Installing...' : 'Install'}
+                {isInstalling ? t('installing') : t('install.install')}
               </button>
               <button
                 onClick={handleDismiss}
                 disabled={isInstalling}
                 className="px-3 py-2 text-spark-text-muted text-sm font-medium hover:text-spark-text-secondary transition-colors"
               >
-                Not Now
+                {t('install.notNow')}
               </button>
             </div>
           </div>

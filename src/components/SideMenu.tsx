@@ -186,7 +186,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
               <button
                 onClick={onClose}
                 className="p-2 -mr-2 text-spark-text-muted hover:text-spark-text-primary rounded-lg hover:bg-white/5 transition-colors"
-                aria-label="Close"
+                aria-label={t('close')}
               >
                 <CloseIcon />
               </button>
@@ -243,7 +243,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose, onLogout, onOpenSe
                 rel="noopener noreferrer"
                 className="block text-xs text-spark-text-muted text-center hover:text-spark-text-secondary transition-colors"
               >
-                Desarrollado por Breez SDK
+                {t('poweredBy')}
               </a>
             </div>
 

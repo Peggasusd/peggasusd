@@ -20,6 +20,7 @@ import { PrimaryButton, SecondaryButton } from '../components/ui';
 import { FingerprintIcon, PasskeyIcon } from '../components/Icons';
 import { AlertCard } from '../components/AlertCard';
 import { getBiometryLabel, secureStorage } from '../services/secureStorage';
+import { t } from '@/services/locale';
 
 interface UnlockPageProps {
   isLoading: boolean;
@@ -51,11 +52,11 @@ const UnlockPage: React.FC<UnlockPageProps> = ({
   }, [isWebPasskey]);
 
   const unlockLabel = isWebPasskey
-    ? 'Unlock with passkey'
-    : biometryLabel ? `Unlock with ${biometryLabel}` : 'Unlock';
+    ? t('unlock.unlockPasskey')
+    : biometryLabel ? `Unlock with ${biometryLabel}` : t('unlock.unlockBiometric');
   const unlockDescription = isWebPasskey
-    ? 'Your wallet is locked. Unlock with your passkey to continue.'
-    : 'Your wallet is locked. Unlock with your biometric to continue.';
+    ? t('unlock.lockedPasskey')
+    : t('unlock.lockedBiometric');
   const UnlockIcon = isWebPasskey ? PasskeyIcon : FingerprintIcon;
 
   return (
@@ -70,7 +71,7 @@ const UnlockPage: React.FC<UnlockPageProps> = ({
               className="w-36 h-36"
             />
             <h1 className="font-display text-2xl font-bold text-spark-text-primary">
-              Welcome back
+              {t('unlock.welcomeBack')}
             </h1>
             <p className="text-sm text-spark-text-secondary text-center">
               {unlockDescription}
@@ -79,7 +80,7 @@ const UnlockPage: React.FC<UnlockPageProps> = ({
 
           {/* Error banner */}
           {error && (
-            <AlertCard variant="error" title="Unlock failed">
+            <AlertCard variant="error" title={t('unlock.failed')}>
               {error}
             </AlertCard>
           )}
@@ -99,7 +100,7 @@ const UnlockPage: React.FC<UnlockPageProps> = ({
               disabled={isLoading}
               className="w-full"
             >
-              Use a Different Wallet
+              {t('unlock.useDifferentWallet')}
             </SecondaryButton>
           </div>
         </div>

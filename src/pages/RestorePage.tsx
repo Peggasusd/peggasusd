@@ -3,6 +3,7 @@ import PageLayout from '../components/layout/PageLayout';
 import { PrimaryButton } from '../components/ui';
 import { SimpleAlert } from '../components/AlertCard';
 import { UploadIcon } from '../components/Icons';
+import { t } from '@/services/locale';
 
 interface RestorePageProps {
   onConnect: (mnemonic: string) => Promise<void>;
@@ -25,7 +26,7 @@ const RestorePage: React.FC<RestorePageProps> = ({
     const wordCount = cleaned.split(' ').length;
 
     if (wordCount !== 12 && wordCount !== 24) {
-      setError('Please enter a valid 12 or 24-word recovery phrase');
+      setError(t('restore.invalidPhrase'));
       return;
     }
 
@@ -33,7 +34,7 @@ const RestorePage: React.FC<RestorePageProps> = ({
     try {
       await onConnect(cleaned);
     } catch {
-      setError('Invalid recovery phrase. Please check your words and try again.');
+      setError(t('restore.apiError'));
     }
   };
 
@@ -45,13 +46,13 @@ const RestorePage: React.FC<RestorePageProps> = ({
         className="w-full"
         data-testid="restore-confirm-button"
       >
-        {isLoading ? 'Restoring...' : 'Restore Wallet'}
+        {isLoading ? t('restore.restoring') : t('restore.restoreWallet')}
       </PrimaryButton>
     </div>
   );
 
   return (
-    <PageLayout footer={footer} onBack={onBack} title="Restore from Backup" onClearError={onClearError}>
+    <PageLayout footer={footer} onBack={onBack} title={t('restore.title')} onClearError={onClearError}>
        <div className="max-w-xl mx-auto w-full space-y-4">
         {/* Icon */}
         <div className="flex justify-center mb-6">
@@ -61,7 +62,7 @@ const RestorePage: React.FC<RestorePageProps> = ({
         </div>
 
         <p className="text-spark-text-secondary text-center mb-6">
-          Enter your 12 or 24-word recovery phrase to restore your wallet. Words should be separated by spaces.
+          {t('restore.instruction')}
         </p>
 
         <div className="relative">
@@ -69,7 +70,7 @@ const RestorePage: React.FC<RestorePageProps> = ({
             value={mnemonic}
             onChange={(e) => setMnemonic(e.target.value)}
             className="w-full h-36 px-4 py-3 text-spark-text-primary bg-spark-dark border border-spark-border rounded-xl focus:border-spark-primary focus:ring-2 focus:ring-spark-primary/20 resize-none font-mono text-sm"
-            placeholder="word1 word2 word3 ..."
+            placeholder={t('restore.placeholder')}
             data-testid="mnemonic-input"
           />
         </div>

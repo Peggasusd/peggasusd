@@ -5,6 +5,7 @@ import { useStableBalance } from '../contexts/StableBalanceContext';
 import { useFiatData } from '../contexts/FiatDataContext';
 import { getTokenAmountFromPayment, formatTokenAmount, buildTokenDisplayConfig } from '../utils/tokenFormatting';
 import GlowLogo from './GlowLogo';
+import { t } from '@/services/locale';
 
 interface PaymentReceivedCelebrationProps {
   payment: Payment;
@@ -79,7 +80,7 @@ const PaymentReceivedCelebration: React.FC<PaymentReceivedCelebrationProps> = ({
 
         {/* Title */}
         <h2 className="text-2xl font-display font-bold text-spark-text-primary mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          Payment Received
+          {t('wallet.paymentReceived')}
         </h2>
 
         {/* Amount with brand glow */}
@@ -103,7 +104,7 @@ const PaymentReceivedCelebration: React.FC<PaymentReceivedCelebrationProps> = ({
 
         {/* Tap to dismiss hint */}
         <p className="mt-10 text-spark-text-muted text-sm animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
-          Tap anywhere to dismiss
+          {t('wallet.tapToDismiss')}
         </p>
       </div>
     </div>,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { DialogContainer, DialogCard } from './ui';
+import { t } from '@/services/locale';
 
 interface StableBalanceDisclaimerProps {
   isOpen: boolean;
@@ -9,11 +10,8 @@ interface StableBalanceDisclaimerProps {
   description?: string;
 }
 
-const DEFAULT_TITLE = 'Stable Balance';
-const DEFAULT_DESCRIPTION =
-  'Your balance is held in USD. Incoming BTC is automatically converted to USD, ' +
-  'and outgoing payments are converted back to BTC. Amounts under the conversion ' +
-  'threshold remain as change until they accumulate.';
+const DEFAULT_TITLE = t('stableBalance.title');
+const DEFAULT_DESCRIPTION = t('stableBalance.description');
 
 const StableBalanceDisclaimer: React.FC<StableBalanceDisclaimerProps> = ({
   isOpen,
@@ -41,13 +39,13 @@ const StableBalanceDisclaimer: React.FC<StableBalanceDisclaimerProps> = ({
               onClick={onCancel}
               className="flex-1 py-2.5 rounded-xl font-display font-semibold text-sm border border-spark-border text-spark-text-secondary hover:bg-white/5 transition-colors"
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               onClick={onAccept}
               className="button flex-1 py-2.5"
             >
-              Enable
+              {t('stableBalance.enable')}
             </button>
           </div>
         </div>

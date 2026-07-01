@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DialogContainer, DialogCard, FormInput, PrimaryButton, FormError } from './ui';
 import { hideSplash } from '../main';
 import { LockIcon } from './Icons';
+import { t } from '@/services/locale';
 
 const STAGING_AUTH_KEY = 'staging_authenticated';
 
@@ -47,7 +48,7 @@ const StagingGate: React.FC<StagingGateProps> = ({ children }) => {
       sessionStorage.setItem(STAGING_AUTH_KEY, 'true');
       setIsAuthenticated(true);
     } else {
-      setError('Incorrect password');
+      setError(t('staging.incorrectPassword'));
       setPassword('');
     }
   };
@@ -68,10 +69,10 @@ const StagingGate: React.FC<StagingGateProps> = ({ children }) => {
                 <LockIcon size="xl" className="text-spark-warning" />
               </div>
               <h2 className="font-display text-xl font-bold text-spark-text-primary">
-                Staging Environment
+                {t('staging.title')}
               </h2>
               <p className="text-sm text-spark-text-muted mt-2">
-                This is a development build. Enter the password to continue.
+                {t('staging.description')}
               </p>
             </div>
 
@@ -81,7 +82,7 @@ const StagingGate: React.FC<StagingGateProps> = ({ children }) => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder={t('staging.enterPassword')}
               />
               <FormError error={error} />
             </div>
@@ -91,7 +92,7 @@ const StagingGate: React.FC<StagingGateProps> = ({ children }) => {
               disabled={!password}
               className="w-full"
             >
-              Continue
+              {t('staging.continue')}
             </PrimaryButton>
           </form>
         </DialogCard>

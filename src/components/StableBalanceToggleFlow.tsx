@@ -10,6 +10,7 @@ import { logger, LogCategory } from '../services/logger';
 import StableBalanceDisclaimer from './StableBalanceDisclaimer';
 import { useLatest } from '../hooks/useLatest';
 import StableBalanceFeeConfirm from './StableBalanceFeeConfirm';
+import { t } from '@/services/locale';
 
 type FlowStep = 'disclaimer' | 'estimating' | 'confirm' | 'executing';
 
@@ -65,7 +66,7 @@ const StableBalanceToggleFlow: React.FC<StableBalanceToggleFlowProps> = ({
         : (tokenBal !== null && tokenBal.balance > 0n);
 
       if (!hasBalance) {
-        setInfo('Balance too low to convert — it will remain as change');
+        setInfo(t('stableBalance.balanceTooLow'));
         setStep('confirm');
         return;
       }
@@ -94,7 +95,7 @@ const StableBalanceToggleFlow: React.FC<StableBalanceToggleFlowProps> = ({
 
       // If amount rounds to zero (e.g. fiat rate not loaded yet), skip fee dialog
       if (amount <= 0n) {
-        setInfo('Balance too low to convert — it will remain as change');
+        setInfo(t('stableBalance.balanceTooLow'));
         setStep('confirm');
         return;
       }
@@ -116,7 +117,7 @@ const StableBalanceToggleFlow: React.FC<StableBalanceToggleFlowProps> = ({
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : String(e);
       if (errorMsg.includes('less than minimum required')) {
-        setInfo('Balance too low to convert — it will remain as change');
+        setInfo(t('stableBalance.balanceTooLow'));
         setStep('confirm');
         return;
       }
@@ -214,13 +215,9 @@ const StableBalanceToggleFlow: React.FC<StableBalanceToggleFlowProps> = ({
         isOpen
         onAccept={handleDisclaimerAccept}
         onCancel={onCancel}
-        {...(restorePrompt ? {
-          title: 'USD Balance Detected',
-          description:
-            "We've detected USD funds in your wallet. Would you like to switch to USD mode?" +
-            '\n\n' +
-            'Your balance will be held in USD. Incoming BTC is automatically converted to USD, ' +
-            'and outgoing payments are converted back to BTC.',
+          {...(restorePrompt ? {
+          title: t('stableBalance.usdDetected'),
+          description: t('stableBalance.restorePrompt'),
         } : {})}
       />
     );

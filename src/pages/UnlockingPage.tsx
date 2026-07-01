@@ -17,6 +17,7 @@
 import React, { useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { logger, LogCategory } from '../services/logger';
+import { t } from '@/services/locale';
 
 const UnlockingPage: React.FC = () => {
   useEffect(() => {
@@ -81,7 +82,7 @@ const UnlockingPage: React.FC = () => {
 
           <div className="flex items-center justify-center gap-3 text-spark-text-secondary text-sm">
             <div className="w-5 h-5 rounded-full border-2 border-spark-primary border-t-transparent animate-spin" />
-            <span>Authenticating…</span>
+            <span>{t('unlock.unlocking')}</span>
           </div>
         </div>
       </div>
