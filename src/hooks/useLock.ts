@@ -31,7 +31,9 @@ export type LockActions = {
 };
 
 export function useLock(): LockActions {
-  const [isUnlocked, setIsUnlocked] = useState(true);
+  const [isUnlocked, setIsUnlocked] = useState(() =>
+    localStorage.getItem(LOCK_ENABLED_KEY) !== 'true',
+  );
   const [lockEnabled, setLockEnabledState] = useState(() =>
     localStorage.getItem(LOCK_ENABLED_KEY) === 'true',
   );
