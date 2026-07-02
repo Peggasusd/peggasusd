@@ -610,7 +610,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
               </div>
               <Switch
                 checked={crossChainEnabled}
-                onChange={() => setCrossChainEnabled(!crossChainEnabled)}
+                onChange={() => {
+                  const newVal = !crossChainEnabled;
+                  setCrossChainEnabled(newVal);
+                  const current = getSettings();
+                  saveSettings({ ...current, crossChainEnabled: newVal });
+                }}
               />
             </div>
           </div>
