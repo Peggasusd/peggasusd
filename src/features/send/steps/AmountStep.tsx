@@ -15,7 +15,7 @@ import { useHasPendingConversion } from '../../../contexts/WalletContext';
 import { useFiatData } from '../../../contexts/FiatDataContext';
 import { dismissKeyboard } from '../../../utils/keyboard';
 
-/** Cross-chain destinations are USD stablecoins (USDC/USDT) — amounts are USD. */
+/** Cross-chain destinations are USD stablecoins (USDC/USDT have 6 decimals). */
 const CROSS_CHAIN_FIAT_CURRENCY = 'USD';
 
 export interface AmountStepProps {
@@ -44,13 +44,13 @@ const AmountStep: React.FC<AmountStepProps> = ({
 }) => {
   const { fiatCurrencies, fiatRates } = useFiatData();
 
-  // Cross-chain ("Send USD") denominates in USD even without a stable-balance
-  // token: build a fiat config from FiatData and let the user type dollars,
-  // converted to sats client-side via the BTC→USD rate and funded from BTC.
+  // Cross-chain ("Send USD") denominates in USD stablecoins (USDC/USDT have
+  // 6 native decimals). Override the fiat config to allow up to 6 decimal
+  // places so users can enter precise amounts like 1.1022.
   const fiatOverride = useMemo(() => {
     if (!amountFirst) return undefined;
     return {
-      config: buildFiatDisplayConfig(CROSS_CHAIN_FIAT_CURRENCY, fiatCurrencies),
+      config: { ...buildFiatDisplayConfig(CROSS_CHAIN_FIAT_CURRENCY, fiatCurrencies), fractionSize: 6, decimals: 6 },
       btcFiatRate: fiatRates.find(r => r.coin === CROSS_CHAIN_FIAT_CURRENCY)?.value ?? 0,
     };
   }, [amountFirst, fiatCurrencies, fiatRates]);
