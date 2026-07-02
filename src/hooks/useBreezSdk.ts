@@ -426,14 +426,15 @@ export function useBreezSdk(
         markLabelUsed(passkeyLabel);
       }
 
-      // Write the seed to the right tier. Skip entirely when the seed
-      // was just retrieved from its current tier. All native users get
-      // biometric-bound `secureStorage`; non-native falls back to
-      // `deviceOnlyStorage` or plaintext. Failures are non-fatal: the
-      // wallet is already connected, and the storage layer emits its
-      // own typed breadcrumb.
+      // Write the seed to the right tier for this mode. Skip entirely
+      // when the seed was just retrieved from secure storage. Storage
+      // tiers: passkey native => biometric-bound `secureStorage`,
+      // non-passkey native => `deviceOnlyStorage` (no biometric gate),
+      // web passkey => no cache, web non-passkey => plaintext fallback.
+      // Failures are non-fatal: the wallet is already connected, and
+      // the storage layer emits its own typed breadcrumb.
       if (source !== 'secureStorage') {
-        if (secureStorage.isSupported()) {
+        if (passkeyLabel != null && secureStorage.isSupported()) {
           // Defer the loading-copy flip so a fast Keystore write
           // doesn't flash the "Setting up biometric unlock…" label.
           const labelDeferMs = 250;
@@ -867,7 +868,23 @@ export function useBreezSdk(
       // (A) Legacy plaintext-mnemonic migration (native only).
       await migrateLegacyMnemonicIfNeeded();
 
-      // (C) Biometric unlock. Order matters so the OS prompt
+      // (B) 0.0.3 regression recovery: that release wrote every seed
+      //     into the biometric-bound tier, including non-passkey users.
+      //     Wipe the orphan silently so they re-onboard via mnemonic
+      //     into the right tier. `clearSeed` is unauthenticated.
+      if (
+        secureStorage.isSupported()
+        && !isPasskeyMode()
+        && (await secureStorage.hasStoredSeed())
+      ) {
+        logger.warn(
+          LogCategory.AUTH,
+          'Clearing orphaned biometric-bound seed from 0.0.3 regression',
+        );
+        await secureStorage.clearSeed().catch(() => { /* best-effort */ });
+      }
+
+      // (C) Passkey biometric unlock. Order matters so the OS prompt
       //     lands over a fully-painted UnlockingPage, not a black
       //     splash: flushSync commits the route change before
       //     hideSplash() awaits the WAAPI fade on the compositor, then
@@ -875,7 +892,8 @@ export function useBreezSdk(
       //     main thread on Android WebView; WAAPI sidesteps that.
       let useLegacy = true;
       if (
-        secureStorage.isSupported()
+        isPasskeyMode()
+        && secureStorage.isSupported()
         && (await secureStorage.hasStoredSeed())
       ) {
         logger.info(LogCategory.AUTH, 'unlock:start');
@@ -898,13 +916,13 @@ export function useBreezSdk(
         && (await deviceOnlyStorage.hasStoredSeed())
       ) {
         // (D) Non-passkey native silent reconnect. Plain decrypt, no
-        //     biometric prompt. Re-stored in secureStorage by
-        //     connectWallet so the next cold start gets biometric gate.
+        //     biometric prompt. `source: 'secureStorage'` skips the
+        //     redundant re-write.
         useLegacy = false;
         setIsLoading(true);
         try {
           const seed = await deviceOnlyStorage.retrieveSeed();
-          await connectWallet(seed, false, undefined);
+          await connectWallet(seed, false, undefined, 'secureStorage');
         } catch (e) {
           logger.error(
             LogCategory.SDK,
