@@ -36,6 +36,8 @@ import { useIOSViewportFix } from './hooks/useIOSViewportFix';
 import { useStatusBarColor } from './hooks/useStatusBarColor';
 import { STATUS_BAR_LOADING } from './utils/statusBarManager';
 import { useBackButton } from './hooks/useBackButton';
+import { useLock } from './hooks/useLock';
+import LockScreen from './components/LockScreen';
 import type { Seed, Payment } from '@breeztech/breez-sdk-spark';
 
 type Screen = 'home' | 'restore' | 'generate' | 'wallet' | 'getRefund' | 'settings' | 'about' | 'backup' | 'fiatCurrencies' | 'passkey' | 'unlock' | 'unlocking' | 'passkeySettings' | 'passkeyManagement' | 'labels' | 'passkeyLocalState';
@@ -83,6 +85,7 @@ const AppContent: React.FC = () => {
   useIOSViewportFix();
 
   const sdk = useBreezSdk(showToast);
+  const lock = useLock();
 
   // SDK startup state takes precedence; otherwise the user's screen
   // wins, with one exception: an SDK auto-reconnect (saved mnemonic /
@@ -478,6 +481,14 @@ const AppContent: React.FC = () => {
             <StableBalanceFormatterBridge formatterRef={formatPaymentAmountRef} />
             <ContactsProvider>
               {renderCurrentScreen()}
+              {lock.lockEnabled && !lock.isUnlocked && (
+                <LockScreen
+                  lockType={lock.lockType}
+                  onUnlockBiometric={lock.authenticateBiometric}
+                  onUnlockPin={lock.authenticatePin}
+                  onDisableLock={lock.disableLock}
+                />
+              )}
             </ContactsProvider>
             {sdk.celebrationPayment !== null && (
               <PaymentReceivedCelebration

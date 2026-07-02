@@ -3,12 +3,14 @@ import { FormGroup, FormInput, LoadingSpinner, PrimaryButton, Switch } from '../
 import { getSettings, saveSettings, UserSettings } from '../services/settings';
 import type { Config, Network } from '@breeztech/breez-sdk-spark';
 import { useWallet } from '@/contexts/WalletContext';
-import { CurrencyIcon, ChevronRightIcon, DownloadIcon, ShieldCheckIcon } from '../components/Icons';
+import { CurrencyIcon, ChevronRightIcon, DownloadIcon, ShieldCheckIcon, FingerprintIcon, LockIcon, BackIcon } from '../components/Icons';
 import SlideInPage from '../components/layout/SlideInPage';
 import { logger, LogCategory } from '@/services/logger';
 import { shareOrDownloadLogs, exportDatabaseState } from '@/services/logExport';
 import { useSecretTap } from '@/hooks/useSecretTap';
 import { t } from '../services/locale';
+import { useLock } from '@/hooks/useLock';
+import { secureStorage } from '@/services/secureStorage';
 
 const DEV_MODE_STORAGE_KEY = 'spark-dev-mode';
 
@@ -87,6 +89,21 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const [isDownloadingLogs, setIsDownloadingLogs] = useState<boolean>(false);
   const [isExportingDb, setIsExportingDb] = useState<boolean>(false);
+
+  const lock = useLock();
+
+  // PIN setup wizard state
+  const [pinSetupStep, setPinSetupStep] = useState<'idle' | 'enter' | 'confirm'>('idle');
+  const [pinFirst, setPinFirst] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
+
+  // Change PIN wizard state
+  const [changingPin, setChangingPin] = useState(false);
+  const [oldPinValue, setOldPinValue] = useState('');
+  const [newPinValue, setNewPinValue] = useState('');
+  const [changePinError, setChangePinError] = useState<string | null>(null);
+
+  const bioSupported = secureStorage.isSupported();
 
   // Async SDK read for sparkPrivateModeEnabled. Stays in an effect
   // because it awaits a Promise; setState happens post-await.
@@ -180,6 +197,123 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
     }
   };
 
+  const handleToggleLock = async () => {
+    if (lock.lockEnabled) {
+      await lock.disableLock();
+      setPinSetupStep('idle');
+      setChangingPin(false);
+    } else {
+      if (bioSupported) {
+        const ok = await lock.enableLock('biometric');
+        if (!ok) {
+          // Biometric not available or failed, fallback to PIN setup
+          setPinSetupStep('enter');
+        }
+      } else {
+        setPinSetupStep('enter');
+      }
+    }
+  };
+
+  const handlePinDigit = (d: string) => {
+    setPinError(null);
+    if (pinSetupStep === 'enter') {
+      if (pinFirst.length >= 6) return;
+      const next = pinFirst + d;
+      setPinFirst(next);
+      if (next.length === 6) {
+        setPinSetupStep('confirm');
+        setConfirmPinState('');
+      }
+    } else if (pinSetupStep === 'confirm') {
+      if (!confirmPinState) return;
+      if (confirmPinState.length >= 6) return;
+      const next = confirmPinState + d;
+      setConfirmPinState(next);
+      if (next.length === 6) {
+        if (next === pinFirst) {
+          lock.enableLock('pin', next).then(ok => {
+            if (ok) {
+              setPinSetupStep('idle');
+              setPinFirst('');
+              setConfirmPinState(null);
+            }
+          });
+        } else {
+          setPinError(t('lock.pinMismatch'));
+          setPinSetupStep('enter');
+          setPinFirst('');
+          setConfirmPinState(null);
+        }
+      }
+    }
+    if (changingPin) {
+      if (oldPinValue.length < 6) {
+        const next = oldPinValue + d;
+        setOldPinValue(next);
+        if (next.length === 6) {
+          // Verify old PIN
+          setChangePinError(null);
+        }
+      } else if (newPinValue.length < 6) {
+        const next = newPinValue + d;
+        setNewPinValue(next);
+        if (next.length === 6) {
+          handleChangePinConfirm();
+        }
+      }
+    }
+  };
+
+  const [confirmPinState, setConfirmPinState] = useState<string | null>(null);
+
+  const handlePinDelete = () => {
+    if (changingPin) {
+      if (newPinValue.length > 0) {
+        setNewPinValue(p => p.slice(0, -1));
+      } else if (oldPinValue.length > 0) {
+        setOldPinValue(p => p.slice(0, -1));
+      }
+      return;
+    }
+    if (pinSetupStep === 'confirm' && confirmPinState) {
+      setConfirmPinState(prev => prev ? prev.slice(0, -1) : null);
+      setPinError(null);
+    } else if (pinSetupStep === 'enter') {
+      setPinFirst(p => p.slice(0, -1));
+      setPinError(null);
+    }
+  };
+
+  const handleChangePinConfirm = async () => {
+    if (oldPinValue.length !== 6 || newPinValue.length !== 6) return;
+    const ok = await lock.changePin(oldPinValue, newPinValue);
+    if (ok) {
+      setChangingPin(false);
+      setOldPinValue('');
+      setNewPinValue('');
+      setChangePinError(null);
+    } else {
+      setChangePinError(t('lock.incorrectPin'));
+      setOldPinValue('');
+    }
+  };
+
+  const handleChangePinCancel = () => {
+    setChangingPin(false);
+    setOldPinValue('');
+    setNewPinValue('');
+    setChangePinError(null);
+  };
+
+  // Cancel PIN setup
+  const handleCancelPinSetup = () => {
+    setPinSetupStep('idle');
+    setPinFirst('');
+    setConfirmPinState(null);
+    setPinError(null);
+  };
+
   const footer = isDevMode ? (
     <PrimaryButton className="w-full" onClick={handleSave}>
       {t('settings.saveChanges')}
@@ -210,6 +344,154 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                 <ChevronRightIcon size="md" />
               </button>
             </div>
+          </div>
+
+          {/* Security */}
+          <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
+            <h3 className="font-display font-semibold text-spark-text-primary mb-3">{t('lock.settingTitle')}</h3>
+            <p className="text-sm text-spark-text-muted mb-4">{t('lock.settingDesc')}</p>
+
+            {pinSetupStep !== 'idle' || changingPin ? (
+              /* --- PIN setup / change wizard --- */
+              <div className="flex flex-col items-center gap-4 py-4">
+                <LockIcon size="lg" className="text-spark-primary" />
+                <p className="text-sm font-medium text-spark-text-primary">
+                  {changingPin
+                    ? oldPinValue.length < 6
+                      ? t('lock.currentPin')
+                      : t('lock.newPin')
+                    : pinSetupStep === 'enter'
+                      ? t('lock.enterPin')
+                      : t('lock.confirmPin')}
+                </p>
+
+                {/* PIN dots */}
+                <div className="flex items-center gap-3">
+                  {Array.from({ length: 6 }, (_, i) => {
+                    const filled = changingPin
+                      ? i < (oldPinValue.length < 6 ? oldPinValue : newPinValue).length
+                      : pinSetupStep === 'confirm'
+                        ? i < (confirmPinState ?? '').length
+                        : i < pinFirst.length;
+                    return (
+                      <div
+                        key={i}
+                        className={`w-3 h-3 rounded-full transition-all ${
+                          filled ? 'bg-spark-primary scale-110' : 'bg-spark-border'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+
+                {(pinError || changePinError) && (
+                  <p className="text-sm text-spark-error text-center">{pinError || changePinError}</p>
+                )}
+
+                {/* Numeric keypad */}
+                <div className="w-full max-w-[220px]">
+                  {[['1','2','3'],['4','5','6'],['7','8','9']].map((row, ri) => (
+                    <div key={ri} className="flex gap-2 mb-2">
+                      {row.map(d => (
+                        <button
+                          key={d}
+                          onClick={() => handlePinDigit(d)}
+                          className="flex-1 aspect-square rounded-xl bg-spark-surface text-spark-text-primary text-xl font-semibold hover:bg-white/10 transition-colors active:scale-95"
+                        >
+                          {d}
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <div className="flex-1" />
+                    <button
+                      onClick={() => handlePinDigit('0')}
+                      className="flex-1 aspect-square rounded-xl bg-spark-surface text-spark-text-primary text-xl font-semibold hover:bg-white/10 transition-colors active:scale-95"
+                    >
+                      0
+                    </button>
+                    <button
+                      onClick={handlePinDelete}
+                      className="flex-1 aspect-square rounded-xl bg-spark-surface flex items-center justify-center hover:bg-white/10 transition-colors active:scale-95"
+                    >
+                      <BackIcon size="sm" className="text-spark-text-primary" />
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={changingPin ? handleChangePinCancel : handleCancelPinSetup}
+                  className="text-sm text-spark-text-muted hover:text-spark-text-primary underline transition-colors"
+                >
+                  {t('cancel')}
+                </button>
+              </div>
+            ) : (
+              <>
+                {/* Lock toggle */}
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <ShieldCheckIcon size="md" className="text-spark-text-secondary" />
+                    <span className="font-display font-medium text-spark-text-primary">
+                      {lock.lockEnabled ? t('lock.unlock') : t('lock.settingTitle')}
+                    </span>
+                  </div>
+                  <Switch
+                    checked={lock.lockEnabled}
+                    onChange={handleToggleLock}
+                  />
+                </div>
+
+                {/* Method selection (only when lock is enabled) */}
+                {lock.lockEnabled && (
+                  <div className="space-y-2 pt-2 border-t border-spark-border">
+                    <p className="text-sm font-medium text-spark-text-secondary mb-2">{t('lock.method')}</p>
+
+                    {/* Biometric option */}
+                    {bioSupported && (
+                      <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-spark-border cursor-pointer hover:bg-white/5 transition-colors">
+                        <input
+                          type="radio"
+                          name="lockMethod"
+                          checked={lock.lockType === 'biometric'}
+                          onChange={async () => {
+                            await lock.disableLock();
+                            await lock.enableLock('biometric');
+                          }}
+                          className="accent-spark-primary"
+                        />
+                        <FingerprintIcon size="md" className="text-spark-text-secondary" />
+                        <span className="text-sm text-spark-text-primary">{t('lock.useBiometric')}</span>
+                      </label>
+                    )}
+
+                    {/* PIN option */}
+                    <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-spark-border cursor-pointer hover:bg-white/5 transition-colors">
+                      <input
+                        type="radio"
+                        name="lockMethod"
+                        checked={lock.lockType === 'pin'}
+                        onChange={() => setPinSetupStep('enter')}
+                        className="accent-spark-primary"
+                      />
+                      <LockIcon size="md" className="text-spark-text-secondary" />
+                      <span className="text-sm text-spark-text-primary">{t('lock.usePin')}</span>
+                    </label>
+
+                    {/* Change PIN button (when PIN is active) */}
+                    {lock.lockType === 'pin' && (
+                      <button
+                        onClick={() => setChangingPin(true)}
+                        className="w-full mt-2 py-2 px-4 text-sm font-medium text-spark-text-secondary border border-spark-border rounded-xl hover:text-spark-text-primary hover:bg-white/5 transition-colors"
+                      >
+                        {t('lock.changePin')}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Passkey & Labels */}

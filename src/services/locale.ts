@@ -446,7 +446,28 @@ export type TranslationKey =
   | 'staging.description'
   | 'staging.enterPassword'
   | 'staging.continue'
-  | 'staging.incorrectPassword';
+  | 'staging.incorrectPassword'
+  // Lock
+  | 'lock.title'
+  | 'lock.unlockWith'
+  | 'lock.biometric'
+  | 'lock.disableLock'
+  | 'lock.tryAgain'
+  | 'lock.incorrectPin'
+  | 'lock.settingTitle'
+  | 'lock.settingDesc'
+  | 'lock.method'
+  | 'lock.useBiometric'
+  | 'lock.usePin'
+  | 'lock.enterPin'
+  | 'lock.confirmPin'
+  | 'lock.pinMismatch'
+  | 'lock.changePin'
+  | 'lock.currentPin'
+  | 'lock.newPin'
+  | 'lock.setPin'
+  | 'lock.pinTooShort'
+  | 'lock.unlock';
 
 const translations: Record<Locale, Record<TranslationKey, string>> = {
   en: {
@@ -883,6 +904,27 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'staging.enterPassword': 'Enter password',
     'staging.continue': 'Continue',
     'staging.incorrectPassword': 'Incorrect password',
+    // Lock
+    'lock.title': 'App Locked',
+    'lock.unlockWith': 'Unlock with',
+    'lock.biometric': 'Biometrics',
+    'lock.disableLock': 'Disable app lock',
+    'lock.tryAgain': 'Authentication failed. Try again.',
+    'lock.incorrectPin': 'Incorrect PIN',
+    'lock.settingTitle': 'Security',
+    'lock.settingDesc': 'Lock the app with biometrics or a 6-digit PIN.',
+    'lock.method': 'Lock method',
+    'lock.useBiometric': 'Use biometrics',
+    'lock.usePin': 'Use PIN',
+    'lock.enterPin': 'Enter PIN',
+    'lock.confirmPin': 'Confirm PIN',
+    'lock.pinMismatch': 'PINs do not match',
+    'lock.changePin': 'Change PIN',
+    'lock.currentPin': 'Current PIN',
+    'lock.newPin': 'New PIN',
+    'lock.setPin': 'Set PIN',
+    'lock.pinTooShort': 'PIN must be 6 digits',
+    'lock.unlock': 'Unlock',
   },
 
   es: {
@@ -1319,6 +1361,27 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'staging.enterPassword': 'Introduce la contraseña',
     'staging.continue': 'Continuar',
     'staging.incorrectPassword': 'Contraseña incorrecta',
+    // Lock
+    'lock.title': 'App Bloqueada',
+    'lock.unlockWith': 'Desbloquear con',
+    'lock.biometric': 'Huella digital',
+    'lock.disableLock': 'Desactivar bloqueo de app',
+    'lock.tryAgain': 'Autenticación fallida. Intenta de nuevo.',
+    'lock.incorrectPin': 'PIN incorrecto',
+    'lock.settingTitle': 'Seguridad',
+    'lock.settingDesc': 'Bloquear la app con huella digital o un PIN de 6 dígitos.',
+    'lock.method': 'Método de bloqueo',
+    'lock.useBiometric': 'Usar huella digital',
+    'lock.usePin': 'Usar PIN',
+    'lock.enterPin': 'Ingresa PIN',
+    'lock.confirmPin': 'Confirma PIN',
+    'lock.pinMismatch': 'Los PIN no coinciden',
+    'lock.changePin': 'Cambiar PIN',
+    'lock.currentPin': 'PIN actual',
+    'lock.newPin': 'Nuevo PIN',
+    'lock.setPin': 'Establecer PIN',
+    'lock.pinTooShort': 'El PIN debe ser de 6 dígitos',
+    'lock.unlock': 'Desbloquear',
   },
 };
 
