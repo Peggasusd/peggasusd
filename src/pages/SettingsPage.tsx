@@ -3,14 +3,13 @@ import { FormGroup, FormInput, LoadingSpinner, PrimaryButton, Switch } from '../
 import { getSettings, saveSettings, UserSettings } from '../services/settings';
 import type { Config, Network } from '@breeztech/breez-sdk-spark';
 import { useWallet } from '@/contexts/WalletContext';
-import { CurrencyIcon, ChevronRightIcon, DownloadIcon, ShieldCheckIcon, FingerprintIcon, LockIcon, BackIcon } from '../components/Icons';
+import { CurrencyIcon, ChevronRightIcon, DownloadIcon, ShieldCheckIcon, LockIcon, BackIcon } from '../components/Icons';
 import SlideInPage from '../components/layout/SlideInPage';
 import { logger, LogCategory } from '@/services/logger';
 import { shareOrDownloadLogs, exportDatabaseState } from '@/services/logExport';
 import { useSecretTap } from '@/hooks/useSecretTap';
 import { t } from '../services/locale';
 import { useLock } from '@/hooks/useLock';
-import { secureStorage } from '@/services/secureStorage';
 
 const DEV_MODE_STORAGE_KEY = 'spark-dev-mode';
 
@@ -92,8 +91,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const lock = useLock();
 
-  const bioSupported = secureStorage.isSupported();
-
   // PIN setup wizard: step, current input, saved PIN for confirmation
   const [pinWizStep, setPinWizStep] = useState<'idle' | 'enter' | 'confirm'>('idle');
   const [pinInput, setPinInput] = useState('');
@@ -102,8 +99,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
   // Change PIN wizard
   const [changingPin, setChangingPin] = useState(false);
+  const [changePinStep, setChangePinStep] = useState<'old' | 'new' | 'confirm'>('old');
   const [oldPinValue, setOldPinValue] = useState('');
   const [newPinValue, setNewPinValue] = useState('');
+  const [savedNewPin, setSavedNewPin] = useState<string | null>(null);
   const [changePinError, setChangePinError] = useState<string | null>(null);
 
   // Async SDK read for sparkPrivateModeEnabled. Stays in an effect
@@ -213,7 +212,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
       } else {
         // confirm step: compare
         if (next === savedPin) {
-          lock.enableLock('pin', next);
+          lock.enableLock(next);
           resetPinWiz();
         } else {
           setPinWizError(t('lock.pinMismatch'));
@@ -231,10 +230,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
   };
 
   const pinWizCancel = () => {
-    // If user was toggling PIN on, switch it back off
-    if (lock.lockType === 'pin') {
-      lock.disableLock();
-    }
+    lock.disableLock();
     resetPinWiz();
   };
 
@@ -247,44 +243,46 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
   // ---------- Toggle handlers ----------
 
-  const handleToggleBiometric = async () => {
-    const turningOn = !lock.lockEnabled || lock.lockType !== 'biometric';
-    if (turningOn) {
-      const ok = await lock.enableLock('biometric');
-      if (!ok) {
-        // Biometric failed (no sensor, etc.) — show feedback silently
-      }
-    } else {
-      await lock.disableLock();
-    }
-  };
-
   const handleTogglePin = () => {
-    const turningOn = !lock.lockEnabled || lock.lockType !== 'pin';
-    if (turningOn) {
+    if (lock.lockEnabled) {
+      lock.disableLock();
+    } else {
       setPinWizStep('enter');
       setPinInput('');
       setSavedPin(null);
-    } else {
-      lock.disableLock();
     }
   };
 
   // ---------- Change PIN ----------
 
   const changePinDigit = (d: string) => {
-    if (changingPin) {
-      if (oldPinValue.length < 6) {
-        const next = oldPinValue + d;
-        setOldPinValue(next);
-        if (next.length === 6) {
-          setChangePinError(null);
-        }
-      } else if (newPinValue.length < 6) {
-        const next = newPinValue + d;
-        setNewPinValue(next);
-        if (next.length === 6) {
-          handleDoChangePin();
+    if (!changingPin) return;
+    if (changePinStep === 'old' && oldPinValue.length < 6) {
+      const next = oldPinValue + d;
+      setOldPinValue(next);
+      if (next.length === 6) {
+        setChangePinError(null);
+        setChangePinStep('new');
+      }
+    } else if (changePinStep === 'new' && newPinValue.length < 6) {
+      const next = newPinValue + d;
+      setNewPinValue(next);
+      if (next.length === 6) {
+        setSavedNewPin(next);
+        setNewPinValue('');
+        setChangePinStep('confirm');
+      }
+    } else if (changePinStep === 'confirm' && newPinValue.length < 6) {
+      const next = newPinValue + d;
+      setNewPinValue(next);
+      if (next.length === 6) {
+        if (next === savedNewPin) {
+          handleDoChangePin(oldPinValue, savedNewPin);
+        } else {
+          setChangePinError(t('lock.pinMismatch'));
+          setNewPinValue('');
+          setSavedNewPin(null);
+          setChangePinStep('new');
         }
       }
     }
@@ -293,30 +291,40 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
   const changePinDelete = () => {
     if (newPinValue.length > 0) {
       setNewPinValue(p => p.slice(0, -1));
+    } else if (changePinStep === 'confirm' && savedNewPin) {
+      setChangePinStep('new');
+      setNewPinValue(savedNewPin);
+      setSavedNewPin(null);
+    } else if (changePinStep === 'new') {
+      setOldPinValue('');
+      setChangePinStep('old');
     } else if (oldPinValue.length > 0) {
       setOldPinValue(p => p.slice(0, -1));
     }
   };
 
-  const handleDoChangePin = async () => {
-    if (oldPinValue.length !== 6 || newPinValue.length !== 6) return;
-    const ok = await lock.changePin(oldPinValue, newPinValue);
+  const handleDoChangePin = async (oldPin: string, newPin: string) => {
+    if (oldPin.length !== 6 || newPin.length !== 6) return;
+    const ok = await lock.changePin(oldPin, newPin);
     if (ok) {
-      setChangingPin(false);
-      setOldPinValue('');
-      setNewPinValue('');
-      setChangePinError(null);
+      resetChangePin();
     } else {
       setChangePinError(t('lock.incorrectPin'));
-      setOldPinValue('');
+      resetChangePin();
     }
   };
 
-  const cancelChangePin = () => {
+  const resetChangePin = () => {
     setChangingPin(false);
+    setChangePinStep('old');
     setOldPinValue('');
     setNewPinValue('');
+    setSavedNewPin(null);
     setChangePinError(null);
+  };
+
+  const cancelChangePin = () => {
+    resetChangePin();
   };
 
   // ---------- Shared mini keypad render ----------
@@ -424,14 +432,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
               <div className="flex flex-col items-center gap-4 py-4">
                 <LockIcon size="lg" className="text-spark-primary" />
                 <p className="text-sm font-medium text-spark-text-primary">
-                  {oldPinValue.length < 6 ? t('lock.currentPin') : t('lock.newPin')}
+                  {changePinStep === 'old' ? t('lock.currentPin') : changePinStep === 'new' ? t('lock.newPin') : t('lock.confirmPin')}
                 </p>
                 <div className="flex items-center gap-3">
                   {Array.from({ length: 6 }, (_, i) => (
                     <div
                       key={i}
                       className={`w-3 h-3 rounded-full transition-all ${
-                        i < (oldPinValue.length < 6 ? oldPinValue : newPinValue).length
+                        i < (changePinStep === 'old' ? oldPinValue : newPinValue).length
                           ? 'bg-spark-primary scale-110'
                           : 'bg-spark-border'
                       }`}
@@ -449,37 +457,22 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
                   {t('cancel')}
                 </button>
               </div>
-            ) : (
-              /* --- Lock toggles --- */
+              ) : (
+              /* --- Lock toggle --- */
               <div className="space-y-4">
-                {/* Biometric toggle */}
-                {bioSupported && (
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <FingerprintIcon size="md" className="text-spark-text-secondary" />
-                      <span className="text-sm text-spark-text-primary">{t('lock.useBiometric')}</span>
-                    </div>
-                    <Switch
-                      checked={lock.lockEnabled && lock.lockType === 'biometric'}
-                      onChange={handleToggleBiometric}
-                    />
-                  </div>
-                )}
-
-                {/* PIN toggle */}
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <LockIcon size="md" className="text-spark-text-secondary" />
                     <span className="text-sm text-spark-text-primary">{t('lock.usePin')}</span>
                   </div>
                   <Switch
-                    checked={lock.lockEnabled && lock.lockType === 'pin'}
+                    checked={lock.lockEnabled}
                     onChange={handleTogglePin}
                   />
                 </div>
 
                 {/* Change PIN (only visible when PIN is active) */}
-                {lock.lockEnabled && lock.lockType === 'pin' && (
+                {lock.lockEnabled && (
                   <button
                     onClick={() => setChangingPin(true)}
                     className="w-full py-2 px-4 text-sm font-medium text-spark-text-secondary border border-spark-border rounded-xl hover:text-spark-text-primary hover:bg-white/5 transition-colors"

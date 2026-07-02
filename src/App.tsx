@@ -483,8 +483,6 @@ const AppContent: React.FC = () => {
               {renderCurrentScreen()}
               {lock.lockEnabled && !lock.isUnlocked && (
                 <LockScreen
-                  lockType={lock.lockType}
-                  onUnlockBiometric={lock.authenticateBiometric}
                   onUnlockPin={lock.authenticatePin}
                   onDisableLock={lock.disableLock}
                 />

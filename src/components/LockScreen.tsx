@@ -1,40 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { FingerprintIcon, LockIcon, BackIcon } from './Icons';
-import { getBiometryLabel } from '@/services/secureStorage';
+import React, { useState } from 'react';
+import { LockIcon, BackIcon } from './Icons';
 import { t } from '@/services/locale';
-import type { LockType } from '@/hooks/useLock';
 
 interface LockScreenProps {
-  lockType: LockType;
-  onUnlockBiometric: () => Promise<boolean>;
   onUnlockPin: (pin: string) => Promise<boolean>;
   onDisableLock: () => void;
 }
 
 const LockScreen: React.FC<LockScreenProps> = ({
-  lockType,
-  onUnlockBiometric,
   onUnlockPin,
   onDisableLock,
 }) => {
   const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [biometryLabel, setBiometryLabel] = useState<string | null>(null);
-
-  useEffect(() => {
-    getBiometryLabel().then(setBiometryLabel).catch(() => {});
-  }, []);
-
-  const handleBiometricTap = async () => {
-    setIsLoading(true);
-    setError(null);
-    const ok = await onUnlockBiometric();
-    if (!ok) {
-      setError(t('lock.tryAgain') || 'Authentication failed. Try again.');
-    }
-    setIsLoading(false);
-  };
 
   const handlePinDigit = (d: string) => {
     if (pin.length >= 6) return;
@@ -55,48 +34,12 @@ const LockScreen: React.FC<LockScreenProps> = ({
     setIsLoading(true);
     const ok = await onUnlockPin(value);
     if (!ok) {
-      setError(t('lock.incorrectPin') || 'Incorrect PIN');
+      setError(t('lock.incorrectPin'));
       setPin('');
     }
     setIsLoading(false);
   };
 
-  if (lockType === 'biometric') {
-    return (
-      <div className="fixed inset-0 z-[100] bg-spark-void flex flex-col items-center justify-center px-6">
-        <div className="flex flex-col items-center gap-6 max-w-sm w-full">
-          <div className="w-20 h-20 rounded-2xl bg-spark-primary/20 flex items-center justify-center">
-            {isLoading ? (
-              <div className="w-8 h-8 border-2 border-spark-primary border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <FingerprintIcon size="xl" className="text-spark-primary" />
-            )}
-          </div>
-          <h2 className="font-display text-xl font-semibold text-spark-text-primary text-center">
-            {t('lock.title')}
-          </h2>
-          <button
-            onClick={handleBiometricTap}
-            disabled={isLoading}
-            className="w-full py-3 px-6 bg-spark-primary text-white font-display font-semibold rounded-xl hover:bg-spark-primary-light transition-colors disabled:opacity-50"
-          >
-            {isLoading ? t('unlock.unlocking') : `${t('lock.unlockWith')} ${biometryLabel ?? t('lock.biometric')}`}
-          </button>
-          {error && (
-            <p className="text-sm text-spark-error text-center">{error}</p>
-          )}
-          <button
-            onClick={onDisableLock}
-            className="text-sm text-spark-text-muted hover:text-spark-text-primary transition-colors underline"
-          >
-            {t('lock.disableLock')}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // PIN mode
   const pinDots = Array.from({ length: 6 }, (_, i) => (
     <div
       key={i}
