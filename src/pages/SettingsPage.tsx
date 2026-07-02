@@ -601,21 +601,19 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
             </div>
           )}
 
-          {/* Cross-chain (Send USD) — in review */}
-          {isDevMode && (
-            <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <span className="font-display font-medium text-spark-text-primary block">{t('settings.sendUsd')}</span>
-                  <span className="text-sm text-spark-text-muted">{t('settings.sendUsdDesc')}</span>
-                </div>
-                <Switch
-                  checked={crossChainEnabled}
-                  onChange={() => setCrossChainEnabled(!crossChainEnabled)}
-                />
+          {/* Cross-chain (Send USD) */}
+          <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <span className="font-display font-medium text-spark-text-primary block">{t('settings.sendUsd')}</span>
+                <span className="text-sm text-spark-text-muted">{t('settings.sendUsdDesc')}</span>
               </div>
+              <Switch
+                checked={crossChainEnabled}
+                onChange={() => setCrossChainEnabled(!crossChainEnabled)}
+              />
             </div>
-          )}
+          </div>
 
           {/* Deposit Claim Fee */}
           {isDevMode && (

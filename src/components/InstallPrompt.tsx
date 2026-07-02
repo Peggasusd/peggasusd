@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
-import { DownloadIcon, CloseIcon } from './Icons';
+import { CloseIcon } from './Icons';
 import { t } from '@/services/locale';
 
 const INSTALL_PROMPT_DISMISSED_KEY = 'install_prompt_dismissed';
@@ -89,9 +89,9 @@ const InstallPrompt: React.FC<InstallPromptProps> = ({ onClose }) => {
     >
       <div className="bg-spark-surface border border-spark-border rounded-2xl p-4 shadow-glass-lg">
         <div className="flex items-start gap-3">
-          {/* Download icon */}
-          <div className="shrink-0 w-10 h-10 bg-spark-primary/20 rounded-xl flex items-center justify-center">
-            <DownloadIcon className="text-spark-primary" />
+          {/* App logo */}
+          <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center">
+            <img src="/assets/PEGGASUSD_Logo.png" alt="PEGGASUSD" className="w-8 h-8" />
           </div>
 
           <div className="flex-1 min-w-0">

@@ -1,15 +1,15 @@
-// Glow Service Worker
-const CACHE_NAME = 'glow-v15';
+// PEGGASUSD Service Worker
+const CACHE_NAME = 'peggasusd-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icons/Glow_favicon.png',
-  '/icons/Glow-icon-192.png',
-  '/icons/Glow-icon-512.png',
-  '/icons/Glow-icon-maskable-192.png',
-  '/icons/Glow-icon-maskable-512.png',
-  '/assets/Glow_Logo.png',
+  '/icons/favicon.png',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-192.png',
+  '/icons/icon-maskable-512.png',
+  '/assets/PEGGASUSD_Logo.png',
   '/assets/logo-breez-header.svg',
 ];
 
