@@ -1,44 +1,32 @@
 # PEGGASUSD
 
-**PEGGASUSD** is a self-custodial Lightning Network wallet for Cuba, built as a fork of [Glow](https://github.com/breez/glow-web) (Breez's open-source web wallet). It runs as a PWA on Android via Capacitor.
+**PEGGASUSD** is a self-custodial Lightning Network wallet built with the [Spark SDK](https://sdk-doc-spark.breez.technology/). It runs as a PWA on Android via Capacitor and is based on [Glow](https://github.com/breez/glow-web), Breez's open-source web wallet.
 
-## Key Differences from Glow
+## Accounts
 
-| Aspect | Glow | PEGGASUSD |
-|--------|------|-----------|
-| Seed storage | Passkey-encrypted (WebAuthn) | On-device (localStorage) — no passkey or biometrics required |
-| Authentication | Passkey required | PIN code (6 digits) |
-| Stable balance | Spark tokens | Spark tokens via Flashnet |
-| Cross-chain | — | USDT/USDC send on EVM chains (Flashnet+Boltz) |
-| Target audience | Global | Cuba-focused |
+The wallet manages two balances:
+
+- **SAT account** — your Bitcoin balance on the Lightning Network. Used for sending and receiving Lightning payments (Bolt11, Lightning Address, LNURL-Pay) and Bitcoin on-chain transactions.
+- **USD account** — a stable balance denominated in USD via Spark tokens on Flashnet. When stable balance is active, incoming sats are automatically converted to the USD equivalent using Flashnet's token conversion. On send, the SDK converts USD back to sats as needed.
+
+Spark tokens can be sent and received directly via Spark addresses, providing instant, feeless transfers between Spark wallets.
+
+## Cross-Chain USDT/USDC
+
+You can send USDT/USDC to any EVM-compatible chain (Ethereum, BSC, Polygon, Arbitrum, Optimism, and 30+ others) directly from your PEGGASUSD balance. The SDK routes the payment through **Flashnet** (AMM) and **Boltz** (cross-chain swap), converting your Spark balance to the destination stablecoin on the target chain automatically. This is a send-only feature — receiving stablecoins from external chains is planned for a future SDK release.
 
 ## How It Works
 
 ### Self-Custody
-Your seed phrase is stored **only on your device** in the browser's local storage. There are no passkeys, no biometrics, and no cloud backups. You are in full control of your funds.
+Your seed phrase is stored **only on your device** in the browser's local storage. There are no passkeys, no biometrics, and no cloud backups. Access is protected by a 6-digit PIN.
+
+### Payments
+- **Send**: Lightning, Lightning Address, LNURL-Pay, Bolt11 invoices, Spark address, Bitcoin on-chain address
+- **Receive**: Lightning invoice, Lightning Address, LNURL-Pay, Spark address, Bitcoin on-chain address (auto-swapped to Spark)
+- **Cross-chain send**: USDT/USDC to 30+ EVM chains via Flashnet+Boltz
 
 ### Spark Protocol
-All incoming payments are automatically swapped to **Spark tokens**, giving you a unified USD balance:
-- **Lightning invoices** → received as Spark (USD)
-- **Bitcoin on-chain** → received and auto-swapped to Spark
-
-### USD via Flashnet
-The USD stable balance runs on **Flashnet**, a Lightning-based protocol for stablecoin transfers. When you hold Spark tokens, you're holding a USD-pegged asset on Flashnet.
-
-### Cross-Chain USDT/USDC
-You can send USDT/USDC to any EVM-compatible chain (Ethereum, BSC, Polygon, etc.) through the **Flashnet+Boltz** bridge. The wallet handles the swap from Spark → on-chain token automatically.
-
-## Features
-
-- Send & receive Lightning payments (Bolt11, Lightning Address, LNURL-Pay)
-- Receive Bitcoin on-chain (auto-swapped to Spark)
-- Spark USD stable balance via Flashnet
-- Send USDT/USDC cross-chain to EVM chains
-- QR code scanning for invoices and addresses
-- Contact management
-- Transaction history with real-time updates
-- PIN lock (6 digits)
-- English & Spanish interface
+Spark is a Bitcoin-native Layer 2 built by Lightspark, providing instant settlement and multi-asset support. The SDK runs as WebAssembly in the browser, handling all Lightning and Spark operations without requiring a remote node.
 
 ## Architecture
 
@@ -55,8 +43,6 @@ You can send USDT/USDC to any EVM-compatible chain (Ethereum, BSC, Polygon, etc.
 └──────────────────────┘
 ```
 
-The wallet uses the **Breez SDK** compiled to WebAssembly for all Lightning Network operations. The SDK handles node management, channel operations, payment routing, and the Spark/Flashtnet integration.
-
 ## Build
 
 ### Prerequisites
@@ -67,7 +53,7 @@ The wallet uses the **Breez SDK** compiled to WebAssembly for all Lightning Netw
 ```bash
 npm install
 cp example.env .env.local
-# Edit .env.local — add your VITE_BREEZ_API_KEY
+# Edit .env.local with your VITE_BREEZ_API_KEY
 ```
 
 ### Development
@@ -77,15 +63,17 @@ npm run dev
 
 ### Android APK
 ```bash
-# The CI workflow builds and signs the APK automatically on dispatch.
+# CI builds via GitHub Actions (workflow_dispatch).
 # Manual build:
-flutter build apk --target-platform android-arm64 --release
+npx cap add android && npx cap sync android
+# Then open android/ in Android Studio or use:
+cd android && ./gradlew assembleRelease
 ```
 
 ## Security Note
 
-Your recovery phrase is stored in the browser's `localStorage`. While convenient for self-custody, any JavaScript running in the same origin (including XSS attacks or browser extensions) could potentially access it. For larger amounts, consider using additional security measures or a hardware wallet.
+Your recovery phrase is stored in `localStorage`. Any JavaScript running in the same origin (XSS attacks, malicious browser extensions) could potentially access it. For larger amounts, consider additional security measures.
 
 ## License
 
-Based on Glow by Breez — modified and distributed under the same license terms.
+Based on Glow by Breez — modified and distributed under the same terms.

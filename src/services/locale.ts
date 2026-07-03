@@ -883,7 +883,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'about.technology': 'Technology',
     'about.technologyDesc': 'Built with React, TypeScript, and the Breez SDK. Powered by the Lightning Network, Spark Protocol, Flashnet stablecoins, and Boltz cross-chain swaps.',
     'about.features': 'Features',
-    'about.featuresList': '• Lightning payments (send & receive)\n• Bitcoin on-chain receive (auto-swapped to Spark)\n• USD stable balance via Flashnet\n• Cross-chain USDT/USDC send (EVM via Flashnet+Boltz)\n• QR code scanning\n• Contact management\n• Self-custodial seed on-device\n• Real-time transaction history',
+    'about.featuresList': '• Lightning payments (send & receive)\n• Bitcoin on-chain (send & receive — auto-swapped to Spark on receive)\n• Spark address (send & receive)\n• USD stable balance via Flashnet\n• Cross-chain USDT/USDC send (EVM via Flashnet+Boltz)\n• QR code scanning\n• Contact management\n• Self-custodial seed on-device\n• Real-time transaction history',
     'about.disclaimer': 'PEGGASUSD is experimental software. Use at your own risk.',
     // Cross-chain
     'sendCrossChain.amountTooSmall': 'Amount too small for this route.',
@@ -1350,7 +1350,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'about.technology': 'Tecnología',
     'about.technologyDesc': 'Construida con React, TypeScript y Breez SDK. Impulsada por la Red Lightning, el Protocolo Spark, stablecoins Flashnet y swaps cross-chain Boltz.',
     'about.features': 'Características',
-    'about.featuresList': '• Pagos Lightning (enviar y recibir)\n• Recepción Bitcoin on-chain (conversión automática a Spark)\n• Saldo USD estable vía Flashnet\n• Envío cross-chain USDT/USDC (EVM vía Flashnet+Boltz)\n• Escaneo de códigos QR\n• Gestión de contactos\n• Semilla auto-custodial en el dispositivo\n• Historial de transacciones en tiempo real',
+    'about.featuresList': '• Pagos Lightning (enviar y recibir)\n• Bitcoin on-chain (enviar y recibir — conversión automática a Spark al recibir)\n• Dirección Spark (enviar y recibir)\n• Saldo USD estable vía Flashnet\n• Envío cross-chain USDT/USDC (EVM vía Flashnet+Boltz)\n• Escaneo de códigos QR\n• Gestión de contactos\n• Semilla auto-custodial en el dispositivo\n• Historial de transacciones en tiempo real',
     'about.disclaimer': 'PEGGASUSD es software experimental. Úsalo bajo tu propio riesgo.',
     // Cross-chain
     'sendCrossChain.amountTooSmall': 'Cantidad demasiado pequeña para esta ruta.',
