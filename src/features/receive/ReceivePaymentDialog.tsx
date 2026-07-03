@@ -186,6 +186,10 @@ const ReceivePaymentDialog: React.FC<ReceivePaymentDialogProps> = ({ isOpen, onC
                   <LightningBoltIcon size="sm" />
                   {t('receive.lightning')}
                 </Tab>
+                <Tab isActive={receive.activeTab === 'spark'} onClick={() => handleTabChange('spark')} data-testid="spark-tab">
+                  <span className="font-bold text-sm">SP</span>
+                  {t('receive.spark')}
+                </Tab>
                 <Tab isActive={receive.activeTab === 'bitcoin'} onClick={() => handleTabChange('bitcoin')} data-testid="bitcoin-tab">
                   <span className="font-bold text-sm">₿</span>
                   {t('receive.bitcoin')}

@@ -153,6 +153,7 @@ export type TranslationKey =
   | 'receive.generateInvoice'
   | 'receive.lightning'
   | 'receive.bitcoin'
+  | 'receive.spark'
   | 'receive.lightningInvoice'
   | 'receive.sparkAddress'
   | 'receive.bitcoinAddress'
@@ -619,6 +620,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'receive.generateInvoice': 'Generate Invoice',
     'receive.lightning': 'Lightning',
     'receive.bitcoin': 'Bitcoin',
+    'receive.spark': 'Spark',
     'receive.lightningInvoice': 'Lightning Invoice',
     'receive.sparkAddress': 'Spark Address',
     'receive.bitcoinAddress': 'Bitcoin Address',
@@ -1085,6 +1087,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'receive.generateInvoice': 'Generar factura',
     'receive.lightning': 'Lightning',
     'receive.bitcoin': 'Bitcoin',
+    'receive.spark': 'Spark',
     'receive.lightningInvoice': 'Factura Lightning',
     'receive.sparkAddress': 'Dirección Spark',
     'receive.bitcoinAddress': 'Dirección Bitcoin',
