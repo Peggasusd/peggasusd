@@ -5,6 +5,7 @@ import { generateRandomName } from '../../../utils/randomName';
 import { logger, LogCategory } from '@/services/logger';
 import { formatError } from '@/utils/formatError';
 import { useLatest } from '../../../hooks/useLatest';
+import { t } from '@/services/locale';
 
 export interface UseLightningAddress {
   address: LightningAddressInfo | null;
@@ -22,7 +23,7 @@ export interface UseLightningAddress {
   reset: () => void;
 }
 
-const UNSUPPORTED_MESSAGE = 'Lightning addresses are not available in this environment.';
+const UNSUPPORTED_MESSAGE = t('receive.unsupportedEnvironment');
 
 export const useLightningAddress = (): UseLightningAddress => {
   const wallet = useWallet();
@@ -98,7 +99,7 @@ export const useLightningAddress = (): UseLightningAddress => {
           const username = baseName + suffix;
           const isAvailable = await wallet.checkLightningAddressAvailable({ username });
           if (isAvailable) {
-            await wallet.registerLightningAddress({ username, description: `Pay to ${username}@breez.tips` });
+            await wallet.registerLightningAddress({ username, description: t('receive.payTo', { username }) });
             addr = await wallet.getLightningAddress();
             break;
           }
@@ -112,7 +113,7 @@ export const useLightningAddress = (): UseLightningAddress => {
       if (err instanceof Error && /lnurl server is not configured/i.test(err.message)) {
         markUnsupported();
       } else {
-        setError(`Failed to load Lightning address: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setError(`${t('receive.failedLoadAddress')}: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     } finally {
       setIsLoading(false);
@@ -167,7 +168,7 @@ export const useLightningAddress = (): UseLightningAddress => {
     }
     const username = extractUsername(editValue.trim());
     if (!username) {
-      setError('Please enter a username');
+      setError(t('receive.enterUsername'));
       return;
     }
 
@@ -177,12 +178,12 @@ export const useLightningAddress = (): UseLightningAddress => {
     try {
       const isAvailable = await wallet.checkLightningAddressAvailable({ username });
       if (!isAvailable) {
-        setError('This username is not available');
+        setError(t('receive.usernameNotAvailable'));
         setIsLoading(false);
         return;
       }
 
-      await wallet.registerLightningAddress({ username, description: `Pay to ${username}@breez.tips` });
+      await wallet.registerLightningAddress({ username, description: t('receive.payTo', { username }) });
       const actualInfo = await wallet.getLightningAddress();
       setAddress(actualInfo ?? null);
       setIsEditing(false);
@@ -194,7 +195,7 @@ export const useLightningAddress = (): UseLightningAddress => {
       if (err instanceof Error && /lnurl server is not configured/i.test(err.message)) {
         markUnsupported();
       } else {
-        setError(`Failed to save Lightning address: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setError(`${t('receive.failedSaveAddress')}: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     } finally {
       setIsLoading(false);

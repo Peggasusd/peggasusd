@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useWallet } from '../../../contexts/WalletContext';
 import { logger, LogCategory } from '@/services/logger';
 import { formatError } from '@/utils/formatError';
+import { t } from '@/services/locale';
 import { toSdkAmountNumber, type Sats } from '../../../types/sats';
 import type { PaymentMethod, ReceiveStep } from '../../../types/domain';
 import { LIGHTNING_INVOICE_MIN_SATS, LIGHTNING_INVOICE_MAX_SATS } from '../../../constants/receive';
@@ -125,7 +126,7 @@ export function useReceivePayment(): UseReceivePaymentReturn {
       setSparkAddress(receiveResponse.paymentRequest);
     } catch (err) {
       logger.error(LogCategory.PAYMENT, 'Failed to generate Spark address', { error: formatError(err) });
-      setError(`Failed to generate Spark address: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(`${t('receive.failedSparkAddress')}: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setSparkLoading(false);
     }
@@ -141,7 +142,7 @@ export function useReceivePayment(): UseReceivePaymentReturn {
       setBitcoinAddress(receiveResponse.paymentRequest);
     } catch (err) {
       logger.error(LogCategory.PAYMENT, 'Failed to generate Bitcoin address', { error: formatError(err) });
-      setError(`Failed to generate Bitcoin address: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(`${t('receive.failedBitcoinAddress')}: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setBitcoinLoading(false);
     }
@@ -161,21 +162,21 @@ export function useReceivePayment(): UseReceivePaymentReturn {
     // close to the SDK call. Errors here skip the loading-step flash
     // and just set `error` so the panel stays open with the message.
     if (amountSats === null) {
-      setError('Please enter a valid amount');
+      setError(t('receive.enterValidAmount'));
       return;
     }
     if (amountSats < BigInt(LIGHTNING_INVOICE_MIN_SATS)) {
-      setError(`Amount must be at least ₿${LIGHTNING_INVOICE_MIN_SATS.toLocaleString()}`);
+      setError(t('receive.amountMin', { min: LIGHTNING_INVOICE_MIN_SATS.toLocaleString() }));
       return;
     }
     if (amountSats > BigInt(LIGHTNING_INVOICE_MAX_SATS)) {
-      setError(`Amount must be at most ₿${LIGHTNING_INVOICE_MAX_SATS.toLocaleString()}`);
+      setError(t('receive.amountMax', { max: LIGHTNING_INVOICE_MAX_SATS.toLocaleString() }));
       return;
     }
 
     const amountSatsForSdk = toSdkAmountNumber(amountSats);
     if (amountSatsForSdk === null) {
-      setError('Invalid amount');
+      setError(t('receive.invalidAmount'));
       return;
     }
 
@@ -207,7 +208,7 @@ export function useReceivePayment(): UseReceivePaymentReturn {
       setCurrentStep('qr');
     } catch (err) {
       logger.error(LogCategory.PAYMENT, 'Failed to generate invoice', { error: formatError(err) });
-      setError(`Failed to generate invoice: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(`${t('receive.failedInvoice')}: ${err instanceof Error ? err.message : 'Unknown error'}`);
       setCurrentStep('input');
       setShowAmountPanel(true);
     } finally {

@@ -172,6 +172,17 @@ export type TranslationKey =
   | 'receive.loadingLightningAddress'
   | 'receive.generatingSpark'
   | 'receive.generatingBitcoin'
+  | 'receive.enterValidAmount'
+  | 'receive.amountMin'
+  | 'receive.amountMax'
+  | 'receive.failedInvoice'
+  | 'receive.failedSparkAddress'
+  | 'receive.failedBitcoinAddress'
+  | 'receive.failedLoadAddress'
+  | 'receive.enterUsername'
+  | 'receive.usernameNotAvailable'
+  | 'receive.failedSaveAddress'
+  | 'receive.payTo'
   | 'receive.confirmUsernameChange'
   | 'receive.change'
   | 'receive.edit'
@@ -188,6 +199,12 @@ export type TranslationKey =
   | 'send.enterAmountSats'
   | 'send.enterAmountToken'
   | 'send.enterAmountUsd'
+  | 'send.enterValidAmount'
+  | 'send.enterDestination'
+  | 'send.invalidDestination'
+  | 'send.failedToPrepare'
+  | 'send.paymentFailed'
+  | 'send.operationFailed'
   | 'send.sendAll'
   | 'send.balanceUpdating'
   | 'send.paste'
@@ -640,6 +657,17 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'receive.loadingLightningAddress': 'Loading Lightning Address...',
     'receive.generatingSpark': 'Generating Spark address...',
     'receive.generatingBitcoin': 'Generating Bitcoin address...',
+    'receive.enterValidAmount': 'Please enter a valid amount',
+    'receive.amountMin': 'Amount must be at least ₿{min}',
+    'receive.amountMax': 'Amount must be at most ₿{max}',
+    'receive.failedInvoice': 'Failed to generate invoice',
+    'receive.failedSparkAddress': 'Failed to generate Spark address',
+    'receive.failedBitcoinAddress': 'Failed to generate Bitcoin address',
+    'receive.failedLoadAddress': 'Failed to load Lightning address',
+    'receive.enterUsername': 'Please enter a username',
+    'receive.usernameNotAvailable': 'This username is not available',
+    'receive.failedSaveAddress': 'Failed to save Lightning address',
+    'receive.payTo': 'Pay to {username}@breez.tips',
     'receive.confirmUsernameChange': 'Confirm Username Change',
     'receive.change': 'Change',
     'receive.edit': 'Edit',
@@ -656,6 +684,9 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'send.enterAmountSats': 'Enter amount in satoshis',
     'send.enterAmountToken': 'Enter amount in {tokenSymbol}',
     'send.enterAmountUsd': 'Enter amount in USD',
+    'send.enterValidAmount': 'Please enter a valid amount',
+    'send.enterDestination': 'Please enter a payment destination',
+    'send.invalidDestination': 'Invalid payment destination',
     'send.sendAll': 'Send All',
     'send.balanceUpdating': 'Balance is updating. Try again in a moment.',
     'send.paste': 'Paste',
@@ -669,12 +700,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'send.lnurlAuth': 'LNURL Auth',
     'send.sendUsd': 'Send USD',
     'send.payment': 'Payment',
-    'send.enterValidAmount': 'Please enter a valid amount',
-    'send.enterDestination': 'Please enter a payment destination',
-    'send.invalidDestination': 'Invalid payment destination',
     'send.amountExceedsBalance': 'Amount exceeds available balance',
-    'send.paymentFailed': 'Payment failed: {error}',
-    'send.operationFailed': 'Operation failed: {error}',
     'send.youreSending': "You're sending",
     'send.recipientGets': 'Recipient gets',
     'send.conversionAmount': 'Conversion amount',
@@ -703,6 +729,8 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'send.commentOptional': 'Comment (optional)',
     'send.addMessage': 'Add a message...',
     'send.failedToPrepare': 'Failed to prepare payment: {error}',
+    'send.paymentFailed': 'Payment failed: {error}',
+    'send.operationFailed': 'Operation failed: {error}',
     'send.invalidPaymentDestination': 'Invalid payment destination',
     'send.selectFeeRate': 'Select Fee Rate',
     'send.slow': 'Slow',
@@ -1108,6 +1136,17 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'receive.loadingLightningAddress': 'Cargando dirección Lightning...',
     'receive.generatingSpark': 'Generando dirección Spark...',
     'receive.generatingBitcoin': 'Generando dirección Bitcoin...',
+    'receive.enterValidAmount': 'Por favor ingresa una cantidad válida',
+    'receive.amountMin': 'La cantidad debe ser al menos ₿{min}',
+    'receive.amountMax': 'La cantidad debe ser como máximo ₿{max}',
+    'receive.failedInvoice': 'Error al generar factura',
+    'receive.failedSparkAddress': 'Error al generar dirección Spark',
+    'receive.failedBitcoinAddress': 'Error al generar dirección Bitcoin',
+    'receive.failedLoadAddress': 'Error al cargar dirección Lightning',
+    'receive.enterUsername': 'Por favor ingresa un nombre de usuario',
+    'receive.usernameNotAvailable': 'Este nombre de usuario no está disponible',
+    'receive.failedSaveAddress': 'Error al guardar dirección Lightning',
+    'receive.payTo': 'Pagar a {username}@breez.tips',
     'receive.confirmUsernameChange': 'Confirmar cambio de usuario',
     'receive.change': 'Cambiar',
     'receive.edit': 'Editar',
@@ -1124,6 +1163,9 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'send.enterAmountSats': 'Introduce cantidad en satoshis',
     'send.enterAmountToken': 'Introduce cantidad en {tokenSymbol}',
     'send.enterAmountUsd': 'Introduce cantidad en USD',
+    'send.enterValidAmount': 'Por favor ingresa una cantidad válida',
+    'send.enterDestination': 'Por favor ingresa un destino de pago',
+    'send.invalidDestination': 'Destino de pago no válido',
     'send.sendAll': 'Enviar todo',
     'send.balanceUpdating': 'El saldo se está actualizando. Intenta de nuevo en un momento.',
     'send.paste': 'Pegar',
@@ -1137,12 +1179,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'send.lnurlAuth': 'Autenticación LNURL',
     'send.sendUsd': 'Enviar USD',
     'send.payment': 'Pago',
-    'send.enterValidAmount': 'Introduce una cantidad válida',
-    'send.enterDestination': 'Introduce un destino de pago',
-    'send.invalidDestination': 'Destino de pago no válido',
     'send.amountExceedsBalance': 'La cantidad excede el saldo disponible',
-    'send.paymentFailed': 'Pago fallido: {error}',
-    'send.operationFailed': 'Operación fallida: {error}',
     'send.youreSending': 'Estás enviando',
     'send.recipientGets': 'El destinatario recibe',
     'send.conversionAmount': 'Cantidad convertida',
@@ -1171,6 +1208,8 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'send.commentOptional': 'Comentario (opcional)',
     'send.addMessage': 'Añade un mensaje...',
     'send.failedToPrepare': 'Error al preparar el pago: {error}',
+    'send.paymentFailed': 'Pago fallido: {error}',
+    'send.operationFailed': 'Operación fallida: {error}',
     'send.invalidPaymentDestination': 'Destino de pago no válido',
     'send.selectFeeRate': 'Seleccionar tarifa',
     'send.slow': 'Lenta',

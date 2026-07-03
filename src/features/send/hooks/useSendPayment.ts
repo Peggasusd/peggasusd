@@ -6,6 +6,7 @@ import { useStableBalance } from '../../../contexts/StableBalanceContext';
 import { getTokenBalance } from '../../../utils/tokenFormatting';
 import { logger, LogCategory } from '@/services/logger';
 import { formatError } from '@/utils/formatError';
+import { t } from '@/services/locale';
 
 export type SendStep = 'input' | 'amount' | 'workflow' | 'processing' | 'result';
 export type ProcessingPhase = 'sending' | 'converting';
@@ -82,7 +83,7 @@ export function useSendPayment(): UseSendPaymentReturn {
     errorStep: SendStep = 'amount',
   ) => {
     if (amount <= 0n) {
-      setError('Please enter a valid amount');
+      setError(t('send.enterValidAmount'));
       return;
     }
     setIsLoading(true);
@@ -99,7 +100,7 @@ export function useSendPayment(): UseSendPaymentReturn {
       setCurrentStep('workflow');
     } catch (err) {
       logger.error(LogCategory.PAYMENT, 'Failed to prepare payment', { error: formatError(err) });
-      setError(`Failed to prepare payment ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(t('send.failedToPrepare', { error: err instanceof Error ? err.message : 'Unknown error' }));
       // Clear any stale response so the confirm step renders its prepare-failed
       // fallback (error + disabled send) instead of an old success render.
       setPrepareResponse(null);
@@ -112,7 +113,7 @@ export function useSendPayment(): UseSendPaymentReturn {
   const processInput = useCallback(async (input: string | null = null) => {
     const currentInput = (input || paymentInput?.rawInput)?.trim();
     if (!currentInput) {
-      setError('Please enter a payment destination');
+      setError(t('send.enterDestination'));
       return;
     }
 
@@ -142,7 +143,7 @@ export function useSendPayment(): UseSendPaymentReturn {
           (m) => m.type === 'bitcoinAddress' || m.type === 'sparkAddress' || m.type === 'bolt11Invoice',
         );
         if (!method) {
-          setError('Invalid payment destination');
+          setError(t('send.invalidDestination'));
           setCurrentStep('input');
           return;
         }
@@ -192,12 +193,12 @@ export function useSendPayment(): UseSendPaymentReturn {
       ) {
         setCurrentStep('workflow');
       } else {
-        setError('Invalid payment destination');
+        setError(t('send.invalidDestination'));
         setCurrentStep('input');
       }
     } catch (err) {
       logger.warn(LogCategory.PAYMENT, 'Failed to parse payment input', { error: formatError(err) });
-      setError('Invalid payment destination');
+      setError(t('send.invalidDestination'));
     } finally {
       setIsLoading(false);
     }
@@ -211,7 +212,7 @@ export function useSendPayment(): UseSendPaymentReturn {
     conversionOptions?: ConversionOptions,
   ) => {
     if (amount <= 0n) {
-      setError('Please enter a valid amount');
+      setError(t('send.enterValidAmount'));
       return;
     }
     setFeesIncluded(!!includeFees);
@@ -276,7 +277,7 @@ export function useSendPayment(): UseSendPaymentReturn {
       setPaymentResult('success');
     } catch (err) {
       logger.error(LogCategory.PAYMENT, 'Payment failed', { error: formatError(err) });
-      setError(`Payment failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(t('send.paymentFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
       setPaymentResult('failure');
     } finally {
       if (listenerId) {
@@ -324,7 +325,7 @@ export function useSendPayment(): UseSendPaymentReturn {
       setPaymentResult('success');
     } catch (err) {
       logger.error(LogCategory.PAYMENT, 'Operation failed during payment flow', { error: formatError(err) });
-      setError(`Operation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(t('send.operationFailed', { error: err instanceof Error ? err.message : 'Unknown error' }));
       setPaymentResult('failure');
     } finally {
       if (listenerId) {
