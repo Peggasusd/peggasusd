@@ -57,7 +57,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ paymentData, feeSats, tit
           showShare
           label={t('receive.lightningInvoice')}
           onCopied={() => showToast('success', t('copied'))}
-          onShareError={() => showToast('error', 'Failed to share')}
+          onShareError={() => showToast('error', t('shareFailed'))}
           data-testid="lightning-invoice-text"
         />
 

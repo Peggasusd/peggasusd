@@ -243,7 +243,7 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
           label={t('receive.lightningAddress')}
           textColor="text-spark-primary"
           onCopied={() => showToast('success', t('copied'))}
-          onShareError={() => showToast('error', 'Failed to share')}
+          onShareError={() => showToast('error', t('shareFailed'))}
           additionalActions={<EditButton onClick={onEdit} />}
           textToCopy={address?.lightningAddress || ''}
           textToShare={address?.lnurl.bech32 || ''}

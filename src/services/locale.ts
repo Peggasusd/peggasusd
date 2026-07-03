@@ -38,6 +38,7 @@ export type TranslationKey =
   | 'error'
   | 'copy'
   | 'copied'
+  | 'shareFailed'
   | 'share'
   | 'saving'
   | 'loading'
@@ -505,6 +506,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     error: 'Error',
     copy: 'Copy',
     copied: 'Copied!',
+    shareFailed: 'Failed to share',
     share: 'Share',
     saving: 'Saving...',
     loading: 'Loading...',
@@ -972,6 +974,7 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     error: 'Error',
     copy: 'Copiar',
     copied: '¡Copiado!',
+    shareFailed: 'Error al compartir',
     share: 'Compartir',
     saving: 'Guardando...',
     loading: 'Cargando...',

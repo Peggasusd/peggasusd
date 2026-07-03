@@ -86,6 +86,24 @@ async function generateAndroidIcons() {
   writeFileSync(join(anydpiDir, 'ic_launcher_round.xml'), adaptiveXml(true));
   console.log('  mipmap-anydpi-v26/ic_launcher.xml (+ round)');
 
+  // 5. Splash screen image (for SplashScreen plugin)
+  const splashSizes = [
+    { dir: 'drawable-mdpi', size: 240 },
+    { dir: 'drawable-hdpi', size: 360 },
+    { dir: 'drawable-xhdpi', size: 480 },
+    { dir: 'drawable-xxhdpi', size: 720 },
+    { dir: 'drawable-xxxhdpi', size: 960 },
+  ];
+  for (const { dir, size } of splashSizes) {
+    const outDir = join(androidResDir, dir);
+    if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
+    await sharp(inputPath)
+      .resize(size, size, { fit: 'contain', background: { r: 7, g: 9, b: 13, alpha: 1 } })
+      .png()
+      .toFile(join(outDir, 'splash.png'));
+    console.log(`  ${dir}/splash.png (${size}x${size})`);
+  }
+
   console.log('Android icons generated successfully!');
 }
 
