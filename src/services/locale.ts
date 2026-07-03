@@ -172,6 +172,11 @@ export type TranslationKey =
   | 'receive.generatingBitcoin'
   | 'receive.confirmUsernameChange'
   | 'receive.change'
+  | 'receive.edit'
+  | 'receive.lightningAddress'
+  | 'receive.createInvoiceWithAmount'
+  | 'receive.unsupportedEnvironment'
+  | 'receive.feeApplied'
   // Send
   | 'send.sendBtcOrUsd'
   | 'send.sendBtc'
@@ -633,6 +638,11 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'receive.generatingBitcoin': 'Generating Bitcoin address...',
     'receive.confirmUsernameChange': 'Confirm Username Change',
     'receive.change': 'Change',
+    'receive.edit': 'Edit',
+    'receive.lightningAddress': 'Lightning Address',
+    'receive.createInvoiceWithAmount': 'Create invoice with specific amount →',
+    'receive.unsupportedEnvironment': 'Lightning addresses are not available in this environment.',
+    'receive.feeApplied': 'A fee of ₿{feeSats} is applied to this transaction.',
     // Send
     'send.sendBtcOrUsd': 'Send BTC or USD',
     'send.sendBtc': 'Send BTC',
@@ -1094,6 +1104,11 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'receive.generatingBitcoin': 'Generando dirección Bitcoin...',
     'receive.confirmUsernameChange': 'Confirmar cambio de usuario',
     'receive.change': 'Cambiar',
+    'receive.edit': 'Editar',
+    'receive.lightningAddress': 'Dirección Lightning',
+    'receive.createInvoiceWithAmount': 'Crear factura con cantidad específica →',
+    'receive.unsupportedEnvironment': 'Las direcciones Lightning no están disponibles en este entorno.',
+    'receive.feeApplied': 'Se aplica una comisión de ₿{feeSats} a esta transacción.',
     // Send
     'send.sendBtcOrUsd': 'Enviar BTC o USD',
     'send.sendBtc': 'Enviar BTC',

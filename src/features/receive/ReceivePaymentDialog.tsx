@@ -23,6 +23,7 @@ import BitcoinAddressDisplay from './BitcoinAddressDisplay';
 import LightningAddressDisplay from './LightningAddressDisplay';
 import AmountPanel from './AmountPanel';
 import { ArrowDownIcon, LightningBoltIcon } from '../../components/Icons';
+import { t } from '../../services/locale';
 
 interface ReceivePaymentDialogProps {
   isOpen: boolean;
@@ -54,15 +55,15 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ paymentData, feeSats, tit
           text={paymentData}
           truncate
           showShare
-          label="Lightning Invoice"
-          onCopied={() => showToast('success', 'Copied!')}
+          label={t('receive.lightningInvoice')}
+          onCopied={() => showToast('success', t('copied'))}
           onShareError={() => showToast('error', 'Failed to share')}
           data-testid="lightning-invoice-text"
         />
 
         {feeSats > 0 && (
           <Alert type="warning" className="mt-8">
-            <center>A fee of ₿{feeSats.toLocaleString()} is applied to this transaction.</center>
+            <center>{t('receive.feeApplied', { feeSats: feeSats.toLocaleString() })}</center>
           </Alert>
         )}
       </div>
@@ -152,18 +153,18 @@ const ReceivePaymentDialog: React.FC<ReceivePaymentDialogProps> = ({ isOpen, onC
 
   const getQRTitle = () => {
     switch (receive.activeTab) {
-      case 'lightning': return 'Lightning Invoice';
-      case 'spark': return 'Spark Address';
-      case 'bitcoin': return 'Bitcoin Address';
-      default: return 'Payment Request';
+      case 'lightning': return t('receive.lightningInvoice');
+      case 'spark': return t('receive.sparkAddress');
+      case 'bitcoin': return t('receive.bitcoinAddress');
+      default: return t('receive.paymentRequest');
     }
   };
 
   const getQRDescription = () => {
     switch (receive.activeTab) {
-      case 'lightning': return 'Scan to pay this Lightning invoice';
-      case 'spark': return 'Use this address to receive payments';
-      case 'bitcoin': return 'Send Bitcoin to this address for automatic Lightning conversion';
+      case 'lightning': return t('receive.scanToPay');
+      case 'spark': return t('receive.useThisAddress');
+      case 'bitcoin': return t('receive.sendBitcoinTo');
       default: return '';
     }
   };
@@ -173,7 +174,7 @@ const ReceivePaymentDialog: React.FC<ReceivePaymentDialogProps> = ({ isOpen, onC
       <BottomSheetContainer isOpen={isOpen} onClose={onClose} showBackdrop>
         <BottomSheetCard>
           <DialogHeader
-            title="Receive"
+            title={t('receive.title')}
             onClose={onClose}
             icon={<ArrowDownIcon />}
           />
@@ -181,13 +182,13 @@ const ReceivePaymentDialog: React.FC<ReceivePaymentDialogProps> = ({ isOpen, onC
           {isContentReady ? (
             <TabContainer>
               <TabList>
-                <Tab isActive={receive.activeTab === 'lightning'} onClick={() => handleTabChange('lightning')} data-testid="lightning-tab">
+                  <Tab isActive={receive.activeTab === 'lightning'} onClick={() => handleTabChange('lightning')} data-testid="lightning-tab">
                   <LightningBoltIcon size="sm" />
-                  Lightning
+                  {t('receive.lightning')}
                 </Tab>
                 <Tab isActive={receive.activeTab === 'bitcoin'} onClick={() => handleTabChange('bitcoin')} data-testid="bitcoin-tab">
                   <span className="font-bold text-sm">₿</span>
-                  Bitcoin
+                  {t('receive.bitcoin')}
                 </Tab>
               </TabList>
 
@@ -223,7 +224,7 @@ const ReceivePaymentDialog: React.FC<ReceivePaymentDialogProps> = ({ isOpen, onC
 
                 {receive.currentStep === 'loading' && (
                   <div className="flex flex-col items-center justify-center h-40" data-testid="invoice-generation-loading">
-                    <LoadingSpinner text={`Generating ${getQRTitle().toLowerCase()}...`} />
+                    <LoadingSpinner text={receive.activeTab === 'lightning' ? t('receive.generatingInvoice') : receive.activeTab === 'spark' ? t('receive.generatingSpark') : t('receive.generatingBitcoin')} />
                   </div>
                 )}
 
@@ -260,17 +261,17 @@ const ReceivePaymentDialog: React.FC<ReceivePaymentDialogProps> = ({ isOpen, onC
             // because `isContentReady` gates the tab UI, so a
             // Lightning-specific copy is safe.
             <div className="text-center py-8">
-              <LoadingSpinner text="Loading Lightning Address..." />
+              <LoadingSpinner text={t('receive.loadingLightningAddress')} />
             </div>
           )}
         </BottomSheetCard>
 
         <ConfirmDialog
           isOpen={showChangeConfirm}
-          title="Confirm Username Change"
+          title={t('receive.confirmUsernameChange')}
           message={getAddressChangeMessage()}
-          confirmLabel="Change"
-          cancelLabel="Cancel"
+          confirmLabel={t('receive.change')}
+          cancelLabel={t('cancel')}
           variant="warning"
           onConfirm={async () => {
             setShowChangeConfirm(false);

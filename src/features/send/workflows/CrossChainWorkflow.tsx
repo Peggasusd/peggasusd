@@ -410,7 +410,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
             </div>
           )}
           <div className="mb-4 min-h-0 flex flex-col">
-            <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">{t('sendCrossChain.selectNetwork', { asset: selectedAsset })}</label>
+            <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">{t('sendCrossChain.selectNetwork', { asset: selectedAsset ?? '' })}</label>
             <div className="space-y-2 overflow-y-auto min-h-0 pr-1">
               {chainsForAsset.map(r => {
                 const key = chainGroupKey(r);
@@ -488,7 +488,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
           ) : (
             <div className="mb-4 min-h-0 flex flex-col">
               <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">
-                {t('sendCrossChain.selectProvider', { asset: selectedAsset, chain: capitalizeFirst(routesForSelection[0]?.chain ?? '') })}
+                {t('sendCrossChain.selectProvider', { asset: selectedAsset ?? '', chain: capitalizeFirst(routesForSelection[0]?.chain ?? '') })}
               </label>
               <div className="space-y-2 overflow-y-auto min-h-0 pr-1">
                 {visibleProviders.map((pq) => {

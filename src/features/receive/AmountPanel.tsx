@@ -18,6 +18,7 @@ import { useAmountInput } from '../../hooks/useAmountInput';
 import type { Sats } from '../../types/sats';
 import { dismissKeyboard } from '../../utils/keyboard';
 import { LIGHTNING_INVOICE_MIN_SATS, LIGHTNING_INVOICE_MAX_SATS } from '../../constants/receive';
+import { t } from '../../services/locale';
 
 interface AmountPanelProps {
   isOpen: boolean;
@@ -135,7 +136,7 @@ const AmountPanel: React.FC<AmountPanelProps> = ({
     <BottomSheetContainer isOpen={isOpen} onClose={onClose} showBackdrop>
       <BottomSheetCard>
         <DialogHeader
-          title="Create Invoice"
+          title={t('receive.createInvoice')}
           onClose={onClose}
           icon={<LightningBoltIcon />}
         />
@@ -145,7 +146,7 @@ const AmountPanel: React.FC<AmountPanelProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-spark-text-secondary text-sm font-medium">
-                Amount
+                {t('receive.amount')}
               </label>
               {/* Range badge — matches LnurlWorkflow's Send-side
                   treatment at features/send/workflows/LnurlWorkflow.tsx.
@@ -215,7 +216,7 @@ const AmountPanel: React.FC<AmountPanelProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-spark-text-secondary text-sm font-medium mb-2">Description (optional)</label>
+            <label className="block text-spark-text-secondary text-sm font-medium mb-2">{t('receive.descriptionOptional')}</label>
             <textarea
               ref={descriptionInputRef}
               enterKeyHint="done"
@@ -233,14 +234,14 @@ const AmountPanel: React.FC<AmountPanelProps> = ({
                   }
                 }
               }}
-              placeholder="What's this for?"
+              placeholder={t('receive.whatsThisFor')}
               disabled={isLoading}
               rows={1}
               className="w-full bg-spark-dark border border-spark-border rounded-xl px-4 py-3 text-spark-text-primary placeholder-spark-text-muted focus:border-spark-primary focus:outline-hidden transition-all resize-none"
             />
           </div>
 
-          <FormError error={amountTooLarge ? 'Invalid amount' : error} data-testid="invoice-error-message" />
+          <FormError error={amountTooLarge ? t('receive.invalidAmount') : error} data-testid="invoice-error-message" />
 
           {/* Generate Button */}
           <PrimaryButton
@@ -256,7 +257,7 @@ const AmountPanel: React.FC<AmountPanelProps> = ({
             className="w-full"
             data-testid="generate-invoice-button"
           >
-            {isLoading ? <LoadingSpinner size="small" /> : 'Generate Invoice'}
+            {isLoading ? <LoadingSpinner size="small" /> : t('receive.generateInvoice')}
           </PrimaryButton>
         </div>
       </BottomSheetCard>

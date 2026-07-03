@@ -2,6 +2,7 @@ import React from 'react';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { QRCodeContainer, CopyableText } from '../../components/ui';
 import { useToast } from '../../contexts/ToastContext';
+import { t } from '../../services/locale';
 
 interface Props {
   address: string | null;
@@ -14,7 +15,7 @@ const BitcoinAddressDisplay: React.FC<Props> = ({ address, isLoading }) => {
   if (isLoading || !address) {
     return (
       <div className="text-center py-8">
-        <LoadingSpinner text="Generating Bitcoin address..." />
+        <LoadingSpinner text={t('receive.generatingBitcoin')} />
       </div>
     );
   }
@@ -28,8 +29,8 @@ const BitcoinAddressDisplay: React.FC<Props> = ({ address, isLoading }) => {
           text={address}
           truncate
           showShare
-          label="Bitcoin Address"
-          onCopied={() => showToast('success', 'Copied!')}
+          label={t('receive.bitcoinAddress')}
+          onCopied={() => showToast('success', t('copied'))}
           onShareError={() => showToast('error', 'Failed to share')}
           data-testid="bitcoin-address-text"
         />

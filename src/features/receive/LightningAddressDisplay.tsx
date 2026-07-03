@@ -6,6 +6,7 @@ import { QRCodeContainer, PrimaryButton, SecondaryButton, FormError, CopyableTex
 import { useToast } from '../../contexts/ToastContext';
 import { EditIcon, LightningBoltIcon } from '../../components/Icons';
 import { dismissKeyboard } from '../../utils/keyboard';
+import { t } from '../../services/locale';
 
 export interface LightningAddressDisplayProps {
   address: LightningAddressInfo | null;
@@ -26,10 +27,10 @@ const EditButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button
     onClick={onClick}
     className="flex items-center gap-2 px-4 border border-spark-border text-spark-text-secondary rounded-xl font-medium text-sm hover:text-spark-text-primary hover:border-spark-border-light transition-colors"
-    title="Edit Lightning Address"
+                    title={t('receive.editLightningAddress')}
   >
     <EditIcon />
-    Edit
+            {t('receive.edit')}
   </button>
 );
 
@@ -61,7 +62,7 @@ const EditingForm: React.FC<EditingFormProps> = ({
           <LightningBoltIcon className="w-7 h-7 text-spark-primary" />
         </div>
         <h3 className="font-display text-lg font-semibold text-spark-text-primary">
-          {address ? 'Edit Address' : 'Create Address'}
+          {address ? t('receive.editAddress') : t('receive.createAddress')}
         </h3>
       </div>
 
@@ -109,7 +110,7 @@ const EditingForm: React.FC<EditingFormProps> = ({
       {/* Action buttons */}
       <div className="flex gap-3 justify-center pt-2 pb-4">
         <SecondaryButton onClick={onCancel} className="flex-1">
-          Cancel
+          {t('cancel')}
         </SecondaryButton>
         <PrimaryButton
           onClick={onSave}
@@ -117,7 +118,7 @@ const EditingForm: React.FC<EditingFormProps> = ({
           className="flex-1"
           data-testid="save-address-button"
         >
-          {isLoading ? <LoadingSpinner size="small" /> : 'Save'}
+          {isLoading ? <LoadingSpinner size="small" /> : t('save')}
         </PrimaryButton>
       </div>
     </div>
@@ -148,9 +149,9 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
           className="w-full text-left"
           dataTestId="lightning-address-unsupported"
         >
-          <h3 className="font-display text-lg font-semibold text-spark-text-primary mb-2">Lightning Address</h3>
+          <h3 className="font-display text-lg font-semibold text-spark-text-primary mb-2">{t('receive.lightningAddress')}</h3>
           <p className="text-spark-text-secondary text-sm">
-            {supportMessage ?? 'Lightning addresses are not available in this environment.'}
+            {supportMessage ?? t('receive.unsupportedEnvironment')}
           </p>
         </SimpleAlert>
 
@@ -160,7 +161,7 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
             className="text-sm show-amount-panel-button"
             data-testid="show-amount-panel-button"
           >
-            Create invoice with specific amount →
+            {t('receive.createInvoiceWithAmount')}
           </TextButton>
         </div>
       </div>
@@ -187,7 +188,7 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
   if (isLoading && !address) {
     return (
       <div className="text-center py-8">
-        <LoadingSpinner text="Loading Lightning Address..." />
+        <LoadingSpinner text={t('receive.loadingLightningAddress')} />
       </div>
     );
   }
@@ -196,11 +197,11 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
     return (
       <div className="pt-4 space-y-6 flex flex-col items-center">
         <div className="text-center">
-          <h3 className="font-display text-lg font-semibold text-spark-text-primary mb-2">Lightning Address</h3>
+          <h3 className="font-display text-lg font-semibold text-spark-text-primary mb-2">{t('receive.lightningAddress')}</h3>
           <p className="text-spark-text-secondary text-sm mb-4">
-            Create a Lightning Address to receive payments easily
+            {t('receive.receivePaymentsEasily')}
           </p>
-          <PrimaryButton onClick={onEdit}>Create Lightning Address</PrimaryButton>
+          <PrimaryButton onClick={onEdit}>{t('receive.createLightningAddress')}</PrimaryButton>
         </div>
 
         <div className="w-full flex justify-center">
@@ -209,7 +210,7 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
             className="text-sm show-amount-panel-button"
             data-testid="show-amount-panel-button"
           >
-            Create invoice with specific amount →
+            {t('receive.createInvoiceWithAmount')}
           </TextButton>
         </div>
       </div>
@@ -239,14 +240,14 @@ const LightningAddressDisplay: React.FC<LightningAddressDisplayProps> = ({
           text={address?.lightningAddress || ''}
           truncate
           showShare
-          label="Lightning Address"
+          label={t('receive.lightningAddress')}
           textColor="text-spark-primary"
-          onCopied={() => showToast('success', 'Copied!')}
+          onCopied={() => showToast('success', t('copied'))}
           onShareError={() => showToast('error', 'Failed to share')}
           additionalActions={<EditButton onClick={onEdit} />}
           textToCopy={address?.lightningAddress || ''}
           textToShare={address?.lnurl.bech32 || ''}
-          shareLabel="LNURL-Pay"
+          shareLabel={t('receive.lnurlPay')}
           data-testid="lightning-address-text"
         />
 
