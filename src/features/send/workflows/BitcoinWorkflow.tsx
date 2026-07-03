@@ -4,6 +4,7 @@ import type { PaymentStep } from '../../../types/domain';
 import { PrimaryButton } from '../../../components/ui';
 import { RadioCheckIcon } from '../../../components/Icons';
 import ConfirmStep from '../steps/ConfirmStep';
+import { t } from '../../../services/locale';
 
 interface BitcoinWorkflowProps {
   method: Extract<SendPaymentMethod, { type: 'bitcoinAddress' }>;
@@ -40,7 +41,7 @@ const BitcoinWorkflow: React.FC<BitcoinWorkflowProps> = ({ method, amountSats, f
       {step === 'fee' && (
         <>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-[rgb(var(--text-white))] mb-2">Select Fee Rate</label>
+            <label className="block text-sm font-medium text-[rgb(var(--text-white))] mb-2">{t('send.selectFeeRate')}</label>
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedFeeRate('slow')}
@@ -52,7 +53,7 @@ const BitcoinWorkflow: React.FC<BitcoinWorkflowProps> = ({ method, amountSats, f
                 {selectedFeeRate === 'slow' && (
                   <RadioCheckIcon className="absolute top-2 right-2" />
                 )}
-                <div>Slow</div>
+                <div>{t('send.slow')}</div>
                 <div className="text-xs opacity-70">₿{(fq.speedSlow.l1BroadcastFeeSat + fq.speedSlow.userFeeSat).toLocaleString()}</div>
               </button>
               <button
@@ -65,7 +66,7 @@ const BitcoinWorkflow: React.FC<BitcoinWorkflowProps> = ({ method, amountSats, f
                 {selectedFeeRate === 'medium' && (
                   <RadioCheckIcon className="absolute top-2 right-2" />
                 )}
-                <div>Medium</div>
+                <div>{t('send.medium')}</div>
                 <div className="text-xs opacity-70">₿{(fq.speedMedium.l1BroadcastFeeSat + fq.speedMedium.userFeeSat).toLocaleString()}</div>
               </button>
               <button
@@ -78,21 +79,21 @@ const BitcoinWorkflow: React.FC<BitcoinWorkflowProps> = ({ method, amountSats, f
                 {selectedFeeRate === 'fast' && (
                   <RadioCheckIcon className="absolute top-2 right-2" />
                 )}
-                <div>Fast</div>
+                <div>{t('send.fast')}</div>
                 <div className="text-xs opacity-70">₿{(fq.speedFast.l1BroadcastFeeSat + fq.speedFast.userFeeSat).toLocaleString()}</div>
               </button>
             </div>
           </div>
           <div className="flex gap-3">
             <PrimaryButton onClick={onBack} className="flex-1 bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-lg" disabled={false}>
-              Back
+              {t('back')}
             </PrimaryButton>
             <PrimaryButton
               onClick={() => setStep('confirm')}
               className="flex-1"
               disabled={!selectedFeeRate}
             >
-              Continue
+              {t('continue')}
             </PrimaryButton>
           </div>
         </>

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { ProcessingPhase } from '../hooks/useSendPayment';
+import { t } from '../../../services/locale';
 
 export interface ProcessingStepProps {
   /** Operation type to customize messaging (default: 'payment') */
@@ -13,14 +14,14 @@ const ProcessingStep: React.FC<ProcessingStepProps> = ({ operationType = 'paymen
   const isConverting = processingPhase === 'converting';
 
   const getTitle = () => {
-    if (isAuth) return 'Authenticating...';
-    if (isConverting) return 'Converting...';
-    return 'Sending...';
+    if (isAuth) return t('lnurlAuth.authenticating');
+    if (isConverting) return t('send.convertingTitle');
+    return t('send.sendingTitle');
   };
   const getDescription = () => {
-    if (isAuth) return 'Please wait while we verify your identity...';
-    if (isConverting) return 'Please wait while we convert the amount...';
-    return 'Please wait while we process your transaction...';
+    if (isAuth) return t('send.processingAuthDesc');
+    if (isConverting) return t('send.processingConversionDesc');
+    return t('send.processingSendingDesc');
   };
 
   // Key icon for auth, lightning bolt for payment

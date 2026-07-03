@@ -13,6 +13,7 @@ import CurrencySwitcher from '../../../components/ui/CurrencySwitcher';
 import { useAmountInput } from '../../../hooks/useAmountInput';
 import { useBalanceValidation } from '../hooks/useBalanceValidation';
 import { useHasPendingConversion } from '../../../contexts/WalletContext';
+import { t } from '../../../services/locale';
 
 interface LnurlWorkflowProps {
   parsed: LnurlPayRequestDetails;
@@ -107,7 +108,7 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
   // need a clearing effect; the confirm-back handler clears inline.
   const onAmountNext = async () => {
     if (commentAllowed && commentMaxLen && comment.length > commentMaxLen) {
-      setError(`Comment must be at most ${commentMaxLen} characters`);
+      setError(t('send.commentMaxLength', { maxLen: commentMaxLen }));
       return;
     }
 
@@ -132,7 +133,7 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
         logger.error(LogCategory.PAYMENT, 'Failed to prepare LNURL Pay', {
           error: err instanceof Error ? err.message : String(err),
         });
-        setError(`Failed to prepare LNURL Pay: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setError(t('send.failedToPrepare', { error: err instanceof Error ? err.message : 'Unknown error' }));
       } finally {
         setIsLoading(false);
       }
@@ -158,7 +159,7 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
         logger.error(LogCategory.PAYMENT, 'Failed to prepare LNURL Pay', {
           error: err instanceof Error ? err.message : String(err),
         });
-        setError(`Failed to prepare LNURL Pay: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setError(t('send.failedToPrepare', { error: err instanceof Error ? err.message : 'Unknown error' }));
       } finally {
         setIsLoading(false);
       }
@@ -178,11 +179,11 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
     // LNURL range constraints (sats mode only — token mode is validated by the SDK)
     if (!isTokenMode) {
       if (minSats && sats < minSats) {
-        setError(`Amount must be at least ₿${minSats.toLocaleString()}`);
+        setError(t('send.minAmount', { minSats: minSats.toLocaleString('en-US').replace(/,/g, ' ') }));
         return;
       }
       if (maxSats && sats > maxSats) {
-        setError(`Amount must be at most ₿${maxSats.toLocaleString()}`);
+        setError(t('send.maxAmount', { maxSats: maxSats.toLocaleString('en-US').replace(/,/g, ' ') }));
         return;
       }
     }
@@ -198,15 +199,15 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
       });
       setPrepareResponse(resp);
       setStep('confirm');
-    } catch (err) {
-      logger.error(LogCategory.PAYMENT, 'Failed to prepare LNURL Pay', {
-        error: err instanceof Error ? err.message : String(err),
-      });
-      setError(`Failed to prepare LNURL Pay: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      } catch (err) {
+        logger.error(LogCategory.PAYMENT, 'Failed to prepare LNURL Pay', {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        setError(t('send.failedToPrepare', { error: err instanceof Error ? err.message : 'Unknown error' }));
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   const onConfirm = async () => {
     if (!prepareResponse) return;
@@ -244,7 +245,7 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
   // useMemo) because we're past the early-return for the confirm step and
   // can't add a Hook here without violating rules-of-hooks.
   const inlineBalanceError = amountNum > 0 && !isSendAll && balance.exceedsBalance(amountNum)
-    ? 'Amount exceeds available balance'
+    ? t('send.amountExceedsBalance')
     : null;
 
   // amount + optional comment form
@@ -259,7 +260,7 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="block text-sm font-medium text-spark-text-primary">
-            Amount
+            {t('send.amount')}
           </label>
           {!isTokenMode && (
             <span className="text-xs text-spark-text-secondary">
@@ -277,8 +278,8 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
               setFeesIncluded(false);
             }}
             placeholder={isTokenMode && tokenSymbol
-              ? `Enter amount in ${tokenSymbol}`
-              : `Between ${minSats.toLocaleString('en-US').replace(/,/g, ' ')} and ${maxSats.toLocaleString('en-US').replace(/,/g, ' ')} sats`
+              ? t('send.enterAmountToken', { tokenSymbol })
+              : `${t('send.enterAmountSats')} (${minSats.toLocaleString('en-US').replace(/,/g, ' ')} - ${maxSats.toLocaleString('en-US').replace(/,/g, ' ')})`
             }
             className="w-full p-4 pr-16 bg-spark-dark border border-spark-border rounded-xl text-spark-text-primary placeholder-spark-text-muted focus:border-spark-electric focus:ring-2 focus:ring-spark-electric/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none read-only:cursor-not-allowed"
             disabled={isLoading}
@@ -339,7 +340,7 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
                 setFeesIncluded(true);
               }}
               disabled={tokenSendAllBelowThreshold || hasPendingConversion}
-              title={hasPendingConversion ? 'Balance is updating. Try again in a moment.' : undefined}
+              title={hasPendingConversion ? t('send.balanceUpdating') : undefined}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
                 tokenSendAllBelowThreshold || hasPendingConversion
                   ? 'opacity-40 cursor-not-allowed border border-spark-border text-spark-text-secondary'
@@ -351,9 +352,9 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
               {hasPendingConversion ? (
                 <span className="inline-flex items-center justify-center gap-1.5">
                   <SpinnerIcon size="xs" />
-                  Send All
+                  {t('send.sendAll')}
                 </span>
-              ) : 'Send All'}
+              ) : t('send.sendAll')}
             </button>
           )}
         </div>
@@ -363,13 +364,13 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
       {commentAllowed && (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-spark-text-primary">Comment (optional)</label>
+            <label className="block text-sm font-medium text-spark-text-primary">{t('send.commentOptional')}</label>
             <span className="text-xs text-spark-text-secondary">{comment.length}/{commentMaxLen}</span>
           </div>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Add a message..."
+            placeholder={t('send.addMessage')}
             className="w-full p-4 bg-spark-dark border border-spark-border rounded-xl text-spark-text-primary placeholder-spark-text-muted focus:border-spark-electric focus:ring-2 focus:ring-spark-electric/20 resize-none transition-all"
             rows={3}
             maxLength={commentMaxLen}
@@ -383,15 +384,15 @@ const LnurlWorkflow: React.FC<LnurlWorkflowProps> = ({ parsed, recipientLabel, b
       {/* Action buttons */}
       <div className="flex gap-3">
         <SecondaryButton onClick={onBack} disabled={isLoading} className="flex-1">
-          Back
+          {t('back')}
         </SecondaryButton>
         <PrimaryButton onClick={onAmountNext} disabled={isLoading || !validAmount || !!inlineBalanceError} className="flex-1">
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <SpinnerIcon />
-              Processing...
+              {t('processing')}
             </span>
-          ) : 'Continue'}
+          ) : t('continue')}
         </PrimaryButton>
       </div>
     </div>

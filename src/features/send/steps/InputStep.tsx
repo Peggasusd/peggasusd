@@ -11,6 +11,7 @@ import type { Contact } from '@breeztech/breez-sdk-spark';
 import { dismissKeyboard } from '../../../utils/keyboard';
 import { Capacitor } from '@capacitor/core';
 import { Clipboard } from '@capacitor/clipboard';
+import { t } from '../../../services/locale';
 
 export interface InputStepProps {
   paymentInput: string;
@@ -192,7 +193,7 @@ const InputStep: React.FC<InputStepProps> = ({ paymentInput, selectedContactAddr
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-spark-surface border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:border-spark-border-light transition-colors disabled:opacity-50"
         >
           <ClipboardIcon size="xs" />
-          <span className="text-sm font-medium">Paste</span>
+          <span className="text-sm font-medium">{t('send.paste')}</span>
         </button>
         <button
           onClick={onScanQr}
@@ -200,7 +201,7 @@ const InputStep: React.FC<InputStepProps> = ({ paymentInput, selectedContactAddr
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-spark-surface border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:border-spark-border-light transition-colors disabled:opacity-50"
         >
           <QrCodeIcon size="xs" />
-          <span className="text-sm font-medium">Scan</span>
+          <span className="text-sm font-medium">{t('send.scan')}</span>
         </button>
         <button
           onClick={onOpenContacts}
@@ -208,7 +209,7 @@ const InputStep: React.FC<InputStepProps> = ({ paymentInput, selectedContactAddr
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-spark-surface border border-spark-border rounded-xl text-spark-text-secondary hover:text-spark-text-primary hover:border-spark-border-light transition-colors disabled:opacity-50"
         >
           <ContactsIcon size="xs" />
-          <span className="text-sm font-medium">Contacts</span>
+          <span className="text-sm font-medium">{t('send.contacts')}</span>
         </button>
       </div>
 
@@ -227,9 +228,9 @@ const InputStep: React.FC<InputStepProps> = ({ paymentInput, selectedContactAddr
         {isLoading ? (
           <span className="flex items-center justify-center gap-2">
             <SpinnerIcon />
-            Processing...
+            {t('processing')}
           </span>
-        ) : 'Continue'}
+        ) : t('continue')}
       </PrimaryButton>
 
     </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { PrimaryButton, ErrorMessageBox } from '../../../components/ui';
 import { CloseIcon } from '../../../components/Icons';
+import { t } from '../../../services/locale';
 
 export interface ResultStepProps {
   result: 'success' | 'failure';
@@ -15,23 +16,23 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
 
   const getTitle = () => {
     if (operationType === 'auth') {
-      return isSuccess ? 'Authenticated!' : 'Authentication Failed';
+      return isSuccess ? t('send.authenticated') : t('send.authenticationFailed');
     }
-    return isSuccess ? 'Payment Sent!' : 'Payment Failed';
+    return isSuccess ? t('send.paymentSent') : t('send.paymentFailedTitle');
   };
 
   const getSuccessDescription = () => {
     if (operationType === 'auth') {
-      return 'You have successfully authenticated with the service.';
+      return t('send.authSuccessDescription');
     }
-    return 'Your payment has been successfully sent to the recipient.';
+    return t('send.successDescription');
   };
 
   const getDefaultErrorMessage = () => {
     if (operationType === 'auth') {
-      return 'There was an error during authentication. Please try again.';
+      return t('send.authFailedDescription');
     }
-    return 'There was an error processing your payment. Please try again.';
+    return t('send.failedDescription');
   };
 
   if (!isSuccess) {
@@ -44,7 +45,7 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
             error={error || getDefaultErrorMessage()}
           />
           <PrimaryButton onClick={onClose} className="w-full">
-            Close
+            {t('send.close')}
           </PrimaryButton>
         </div>
       );
@@ -72,7 +73,7 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
         </p>
 
         <PrimaryButton onClick={onClose} className="min-w-[200px]">
-          Close
+          {t('send.close')}
         </PrimaryButton>
       </div>
     );
@@ -125,7 +126,7 @@ const ResultStep: React.FC<ResultStepProps> = ({ result, error, onClose, operati
 
       {/* Action button */}
       <PrimaryButton onClick={onClose} className="min-w-[200px]">
-        Done
+        {t('send.done')}
       </PrimaryButton>
     </div>
   );

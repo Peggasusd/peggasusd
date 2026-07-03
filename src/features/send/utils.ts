@@ -1,25 +1,26 @@
 import type { SendInput } from '@/types/domain';
 import type { LnurlPayRequestDetails, LnurlAuthRequestDetails } from '@breeztech/breez-sdk-spark';
+import { t } from '@/services/locale';
 
 export function getPaymentMethodName(input: SendInput | null): string {
   if (!input) return '';
   switch (input.parsedInput.type) {
     case 'bolt11Invoice':
-      return 'Lightning Invoice';
+      return t('send.lightningInvoice');
     case 'sparkAddress':
-      return 'Spark Address';
+      return t('send.sparkAddress');
     case 'bitcoinAddress':
-      return 'Bitcoin Address';
+      return t('send.bitcoinAddress');
     case 'lnurlPay':
-      return 'LNURL Pay';
+      return t('send.lnurlPay');
     case 'lightningAddress':
-      return 'Lightning Address';
+      return t('send.lightningAddress');
     case 'lnurlAuth':
-      return 'LNURL Auth';
+      return t('send.lnurlAuth');
     case 'crossChainAddress':
-      return 'Send USD';
+      return t('send.sendUsd');
     default:
-      return 'Payment';
+      return t('send.payment');
   }
 }
 

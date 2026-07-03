@@ -17,6 +17,7 @@ import { getProviderDisplayName } from '../../../utils/paymentDescription';
 import { truncateAddress, capitalizeFirst, formatCrossChainAmount, formatReceiveAmount } from '../../../utils/crossChainFormat';
 import { formatError } from '@/utils/formatError';
 import CryptoIcon from '../../../components/CryptoIcon';
+import { t } from '../../../services/locale';
 
 type WorkflowStep = 'loading' | 'asset' | 'chain' | 'provider' | 'confirm';
 
@@ -39,9 +40,9 @@ interface ProviderQuote {
 
 function friendlyError(err: unknown): string {
   const raw = err instanceof Error ? err.message : 'Unknown error';
-  if (raw.includes('Amount too small')) return 'Amount too small for this route.';
-  if (raw.includes('Amount too large')) return 'Amount too large for this route.';
-  return 'Failed to get quote.';
+  if (raw.includes('Amount too small')) return t('sendCrossChain.amountTooSmall');
+  if (raw.includes('Amount too large')) return t('sendCrossChain.amountTooLarge');
+  return t('sendCrossChain.failedQuote');
 }
 
 // Group asset variants under a canonical display name (e.g. USDT0 → USDT)
@@ -242,7 +243,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
         if (cancelled) return;
 
         if (!fetched || fetched.length === 0) {
-          setError('No cross-chain routes available for this address');
+          setError(t('sendCrossChain.noRoutes'));
           setStep('asset');
           return;
         }
@@ -254,7 +255,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
           .map(r => assetDisplayName(r.asset))
         )].sort();
         if (assets.length === 0) {
-          setError('No supported stablecoin routes available for this address');
+          setError(t('sendCrossChain.noAssets'));
           setStep('asset');
         } else if (assets.length === 1) {
           selectAsset(assets[0], fetched);
@@ -264,7 +265,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
       } catch (err) {
         if (cancelled) return;
         logger.error(LogCategory.PAYMENT, 'Failed to fetch cross-chain routes', { error: formatError(err) });
-        setError(`Failed to fetch routes: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setError(t('sendCrossChain.failedToFetchRoutes', { error: err instanceof Error ? err.message : 'Unknown error' }));
         setStep('asset');
       }
     })();
@@ -334,10 +335,10 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
   const providerFailureReason = (() => {
     const errs = providerList.map(pq => pq.error ?? '').filter(Boolean);
     if (errs.some(e => e.toLowerCase().includes('too small')))
-      return 'This amount is too small for the available routes. Try sending a larger amount.';
+      return t('sendCrossChain.amountTooSmallFull');
     if (errs.some(e => e.toLowerCase().includes('too large')))
-      return 'This amount is too large for the available routes. Try sending a smaller amount.';
-    return 'Couldn’t get a quote from any provider right now. Try again, or go back and use a different amount.';
+      return t('sendCrossChain.amountTooLargeFull');
+    return t('sendCrossChain.noQuoteFull');
   })();
 
   // Shared card style
@@ -354,7 +355,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
       {step === 'loading' && (
         <div className="flex flex-col items-center justify-center py-12 space-y-3">
           <SpinnerIcon size="lg" className="text-spark-primary animate-spin" />
-          <p className="text-sm text-spark-text-secondary">Fetching routes...</p>
+          <p className="text-sm text-spark-text-secondary">{t('sendCrossChain.fetchingRoutes')}</p>
         </div>
       )}
 
@@ -368,7 +369,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
           )}
           {uniqueAssets.length > 0 && (
             <div className="mb-4 min-h-0 flex flex-col">
-              <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">Select coin</label>
+              <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">{t('sendCrossChain.selectCoin')}</label>
               <div className="space-y-2 overflow-y-auto min-h-0 pr-1">
                 {uniqueAssets.map(asset => (
                   <button
@@ -387,14 +388,14 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
           )}
           <div className="flex gap-3 shrink-0 pt-2">
             <SecondaryButton onClick={onBack} className="flex-1">
-              Back
+              {t('back')}
             </SecondaryButton>
             <PrimaryButton
               onClick={() => { if (pendingAsset) selectAsset(pendingAsset, routes); }}
               className="flex-1"
               disabled={!pendingAsset}
             >
-              Continue
+              {t('continue')}
             </PrimaryButton>
           </div>
         </div>
@@ -409,7 +410,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
             </div>
           )}
           <div className="mb-4 min-h-0 flex flex-col">
-            <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">Select Network for {selectedAsset}</label>
+            <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">{t('sendCrossChain.selectNetwork', { asset: selectedAsset })}</label>
             <div className="space-y-2 overflow-y-auto min-h-0 pr-1">
               {chainsForAsset.map(r => {
                 const key = chainGroupKey(r);
@@ -463,14 +464,14 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
           </div>
           <div className="flex gap-3 shrink-0 pt-2">
             <SecondaryButton onClick={goBackFromChain} className="flex-1">
-              Back
+              {t('back')}
             </SecondaryButton>
             <PrimaryButton
               onClick={() => { if (pendingChain) selectChain(selectedAsset!, pendingChain, routes); }}
               className="flex-1"
               disabled={!pendingChain}
             >
-              Continue
+              {t('continue')}
             </PrimaryButton>
           </div>
         </div>
@@ -481,13 +482,13 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
         <div className="flex flex-col" style={{ maxHeight: '60vh' }}>
           {allProvidersFailed ? (
             <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-              <p className="text-sm font-medium text-spark-text-primary mb-1">Couldn’t get a quote</p>
+              <p className="text-sm font-medium text-spark-text-primary mb-1">{t('sendCrossChain.noQuote')}</p>
               <p className="text-sm text-spark-text-secondary">{providerFailureReason}</p>
             </div>
           ) : (
             <div className="mb-4 min-h-0 flex flex-col">
               <label className="block text-sm font-medium text-spark-text-primary mb-2 shrink-0">
-                Select Provider for {selectedAsset} ({capitalizeFirst(routesForSelection[0]?.chain ?? '')})
+                {t('sendCrossChain.selectProvider', { asset: selectedAsset, chain: capitalizeFirst(routesForSelection[0]?.chain ?? '') })}
               </label>
               <div className="space-y-2 overflow-y-auto min-h-0 pr-1">
                 {visibleProviders.map((pq) => {
@@ -508,20 +509,20 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
                       {pq.loading && (
                         <div className="flex items-center gap-2 mt-2">
                           <SpinnerIcon size="xs" className="animate-spin text-spark-text-secondary" />
-                          <span className="text-xs text-spark-text-secondary">Getting quote...</span>
+                          <span className="text-xs text-spark-text-secondary">{t('sendCrossChain.gettingQuote')}</span>
                         </div>
                       )}
                       {ready && pQuote && (
                         <div className="mt-2 space-y-1.5">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-spark-text-secondary">Receiving</span>
+                            <span className="text-sm text-spark-text-secondary">{t('sendCrossChain.receiving')}</span>
                             <span className="font-mono text-sm text-spark-text-primary">
                               ~{formatReceiveAmount(BigInt(pQuote.estimatedOut), pq.route.decimals)} {pq.route.asset}
                             </span>
                           </div>
                           <div className="border-t border-spark-border/50" />
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-spark-text-secondary">Fee</span>
+                            <span className="text-sm text-spark-text-secondary">{t('sendCrossChain.fee')}</span>
                             <span className="font-mono text-sm text-spark-text-primary">
                               {formatCrossChainAmount(BigInt(pQuote.feeAmount), pq.route.decimals)} {pq.route.asset}
                             </span>
@@ -538,16 +539,16 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
             {allProvidersFailed ? (
               <>
                 <SecondaryButton onClick={onBack} className="flex-1">
-                  Change Amount
+                  {t('sendCrossChain.changeAmount')}
                 </SecondaryButton>
                 <PrimaryButton onClick={() => prepareAllProviders(routesForSelection)} className="flex-1">
-                  Try Again
+                  {t('sendCrossChain.tryAgain')}
                 </PrimaryButton>
               </>
             ) : (
               <>
                 <SecondaryButton onClick={goBackFromProvider} className="flex-1">
-                  Back
+                  {t('back')}
                 </SecondaryButton>
                 <PrimaryButton
                   onClick={() => {
@@ -560,7 +561,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
                   className="flex-1"
                   disabled={!pendingProvider}
                 >
-                  Continue
+                  {t('continue')}
                 </PrimaryButton>
               </>
             )}
@@ -573,7 +574,7 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
         <>
           {/* Amount header */}
           <div className="text-center py-4">
-            <p className="text-spark-text-muted text-sm mb-2">You're sending</p>
+            <p className="text-spark-text-muted text-sm mb-2">{t('sendCrossChain.youreSending')}</p>
             <div className="flex items-baseline justify-center gap-2">
               <span className="text-4xl font-mono font-bold text-spark-text-primary">
                 {effectiveTokenId && stableBalance.displayConfig ? (
@@ -595,23 +596,23 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
             useRawStrings
             items={[
               {
-                label: 'Receiving',
+                label: t('sendCrossChain.receiving'),
                 value: `~${formatReceiveAmount(BigInt(quote.estimatedOut), confirmedRoute.decimals)} ${confirmedRoute.asset}`,
               },
               {
-                label: 'Chain',
+                label: t('sendCrossChain.chain'),
                 value: `${capitalizeFirst(confirmedRoute.chain)}`,
               },
               {
-                label: 'Provider',
+                label: t('sendCrossChain.provider'),
                 value: getProviderDisplayName(confirmedRoute.provider),
               },
               {
-                label: 'Address',
+                label: t('sendCrossChain.address'),
                 value: truncateAddress(quote.recipientAddress, 20),
               },
               {
-                label: 'Fee',
+                label: t('sendCrossChain.fee'),
                 value: `${formatCrossChainAmount(BigInt(quote.feeAmount), confirmedRoute.decimals)} ${confirmedRoute.asset}`,
               },
             ]}
@@ -626,10 +627,10 @@ const CrossChainWorkflow: React.FC<CrossChainWorkflowProps> = ({
 
           <div className="flex gap-3">
             <SecondaryButton onClick={goBackFromConfirm} className="flex-1">
-              Back
+              {t('back')}
             </SecondaryButton>
             <PrimaryButton onClick={handleSend} className="flex-1" disabled={false}>
-              Send
+              {t('send.send')}
             </PrimaryButton>
           </div>
         </>

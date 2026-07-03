@@ -22,6 +22,7 @@ import { ArrowUpIcon } from '@/components/Icons';
 import { useSendPayment } from './hooks/useSendPayment';
 import { getPaymentMethodName, getLnurlPayRequestDetails, getLnurlAuthRequestDetails } from './utils';
 import { isCrossChainEnabled } from '@/services/settings';
+import { t } from '@/services/locale';
 
 interface SendPaymentDialogProps {
   isOpen: boolean;
@@ -80,14 +81,14 @@ const SendPaymentDialog: React.FC<SendPaymentDialogProps> = ({ isOpen, onClose, 
   };
 
   const dialogTitle = send.currentStep === 'input'
-    ? (isCrossChainEnabled() ? 'Send BTC or USD' : 'Send BTC')
+    ? (isCrossChainEnabled() ? t('send.sendBtcOrUsd') : t('send.sendBtc'))
     : getPaymentMethodName(send.paymentInput);
 
   const recipientLabel = useMemo(() => {
     if (send.paymentInput?.parsedInput.type !== 'lightningAddress') return undefined;
     const address = send.paymentInput.rawInput;
     const contact = findContactByAddress(address);
-    return contact ? `Pay to ${contact.name}` : `Pay to ${address}`;
+    return contact ? `${t('send.payTo')} ${contact.name}` : `${t('send.payTo')} ${address}`;
   }, [send.paymentInput, findContactByAddress]);
 
   const lnurlPayDetails = getLnurlPayRequestDetails(send.paymentInput);

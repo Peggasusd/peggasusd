@@ -4,6 +4,7 @@ import { FormError, PrimaryButton, SecondaryButton } from '../../../components/u
 import { KeyIcon, ShieldCheckIcon, SpinnerIcon } from '../../../components/Icons';
 import { logger, LogCategory } from '../../../services/logger';
 import { formatError } from '../../../utils/formatError';
+import { t } from '../../../services/locale';
 
 interface LnurlAuthWorkflowProps {
   parsed: LnurlAuthRequestDetails;
@@ -20,15 +21,15 @@ const LnurlAuthWorkflow: React.FC<LnurlAuthWorkflowProps> = ({ parsed, onBack, o
   const getActionText = (): string => {
     switch (parsed.action) {
       case 'register':
-        return 'Register';
+        return t('lnurlAuth.register');
       case 'login':
-        return 'Log in';
+        return t('lnurlAuth.logIn');
       case 'link':
-        return 'Link account';
+        return t('lnurlAuth.linkAccount');
       case 'auth':
-        return 'Authenticate';
+        return t('lnurlAuth.authenticate');
       default:
-        return 'Authenticate';
+        return t('lnurlAuth.authenticate');
     }
   };
 
@@ -44,7 +45,7 @@ const LnurlAuthWorkflow: React.FC<LnurlAuthWorkflowProps> = ({ parsed, onBack, o
       });
     } catch (err) {
       logger.error(LogCategory.SDK, 'LNURL Auth failed', { error: formatError(err) });
-      setError(`Authentication failed: ${formatError(err)}`);
+      setError(t('lnurlAuth.authFailed', { error: formatError(err) }));
       setIsLoading(false);
     }
   };
@@ -57,7 +58,7 @@ const LnurlAuthWorkflow: React.FC<LnurlAuthWorkflowProps> = ({ parsed, onBack, o
           <KeyIcon size="xl" className="text-spark-primary" />
         </div>
         <p className="text-spark-text-primary font-medium text-lg">{parsed.domain}</p>
-        <p className="text-spark-text-secondary text-sm mt-1">wants you to {getActionText().toLowerCase()}</p>
+        <p className="text-spark-text-secondary text-sm mt-1">{t('lnurlAuth.wantsYouTo')} {getActionText().toLowerCase()}</p>
       </div>
 
       {/* Action description */}
@@ -69,7 +70,7 @@ const LnurlAuthWorkflow: React.FC<LnurlAuthWorkflowProps> = ({ parsed, onBack, o
           <div>
             <p className="text-spark-text-primary font-medium">{getActionText()}</p>
             <p className="text-spark-text-muted text-sm">
-              PEGGASUSD will sign a message to prove your identity without sharing any personal information.
+              {t('lnurlAuth.privacyDesc')}
             </p>
           </div>
         </div>
@@ -80,13 +81,13 @@ const LnurlAuthWorkflow: React.FC<LnurlAuthWorkflowProps> = ({ parsed, onBack, o
       {/* Action buttons */}
       <div className="flex gap-3 pt-2">
         <SecondaryButton onClick={onBack} disabled={isLoading} className="flex-1">
-          Cancel
+          {t('cancel')}
         </SecondaryButton>
         <PrimaryButton onClick={handleAuth} disabled={isLoading} className="flex-1">
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <SpinnerIcon />
-              Authenticating...
+              {t('lnurlAuth.authenticating')}
             </span>
           ) : getActionText()}
         </PrimaryButton>

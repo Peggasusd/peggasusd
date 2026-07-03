@@ -432,6 +432,10 @@ export type TranslationKey =
   | 'sendCrossChain.youreSending'
   | 'sendCrossChain.noQuote'
   | 'sendCrossChain.tryAgain'
+  | 'sendCrossChain.amountTooSmallFull'
+  | 'sendCrossChain.amountTooLargeFull'
+  | 'sendCrossChain.noQuoteFull'
+  | 'sendCrossChain.failedToFetchRoutes'
   // LnurlAuth
   | 'lnurlAuth.register'
   | 'lnurlAuth.logIn'
@@ -889,6 +893,10 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'sendCrossChain.youreSending': "You're sending",
     'sendCrossChain.noQuote': "Couldn't get a quote",
     'sendCrossChain.tryAgain': 'Try Again',
+    'sendCrossChain.amountTooSmallFull': 'This amount is too small for the available routes. Try sending a larger amount.',
+    'sendCrossChain.amountTooLargeFull': 'This amount is too large for the available routes. Try sending a smaller amount.',
+    'sendCrossChain.noQuoteFull': "Couldn't get a quote from any provider right now. Try again, or go back and use a different amount.",
+    'sendCrossChain.failedToFetchRoutes': 'Failed to fetch routes: {error}',
     // LnurlAuth
     'lnurlAuth.register': 'Register',
     'lnurlAuth.logIn': 'Log in',
@@ -1346,6 +1354,10 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'sendCrossChain.youreSending': 'Estás enviando',
     'sendCrossChain.noQuote': 'No se pudo obtener cotización',
     'sendCrossChain.tryAgain': 'Intentar de nuevo',
+    'sendCrossChain.amountTooSmallFull': 'Esta cantidad es demasiado pequeña para las rutas disponibles. Intenta enviar una cantidad mayor.',
+    'sendCrossChain.amountTooLargeFull': 'Esta cantidad es demasiado grande para las rutas disponibles. Intenta enviar una cantidad menor.',
+    'sendCrossChain.noQuoteFull': 'No se pudo obtener cotización de ningún proveedor. Intenta de nuevo o cambia la cantidad.',
+    'sendCrossChain.failedToFetchRoutes': 'Error al obtener rutas: {error}',
     // LnurlAuth
     'lnurlAuth.register': 'Registrarse',
     'lnurlAuth.logIn': 'Iniciar sesión',

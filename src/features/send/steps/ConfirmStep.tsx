@@ -8,6 +8,7 @@ import { useStableBalance } from '../../../contexts/StableBalanceContext';
 import { useBalanceValidation } from '../hooks/useBalanceValidation';
 import { toSats } from '../../../types/sats';
 import type { ConversionEstimate } from '@breeztech/breez-sdk-spark';
+import { t } from '../../../services/locale';
 
 export interface ConfirmStepProps {
   amountSats: bigint | null;
@@ -41,7 +42,7 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ amountSats, feesSat, feesIncl
   const insufficientBalance = totalSats === null
     ? true
     : balance.checkInsufficientFunds({ totalSats, conversionEstimate });
-  const balanceError = insufficientBalance ? 'Insufficient funds' : null;
+  const balanceError = insufficientBalance ? t('send.insufficientFunds') : null;
 
   // Token-formatted values from conversion estimate
   const tokenAmount = isTokenMode && balance.config
@@ -55,7 +56,7 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ amountSats, feesSat, feesIncl
     <div className="space-y-6">
       {/* Total amount display — always show sats */}
       <div className="text-center py-4">
-        <p className="text-spark-text-muted text-sm mb-2">You're sending</p>
+        <p className="text-spark-text-muted text-sm mb-2">{t('send.youreSending')}</p>
         <div className="flex items-baseline justify-center gap-2">
           <span className="text-4xl font-mono font-bold text-spark-text-primary">
             <span className="inline-flex items-center"><span className="text-[0.8em] opacity-70 mr-px">₿</span>{formatWithThinSpaces(total)}</span>
@@ -64,15 +65,15 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ amountSats, feesSat, feesIncl
       </div>
 
       {/* Sats breakdown */}
-      <SimpleFeeBreakdown amount={feesIncluded ? amount - fee : amount} fee={fee} amountLabel={feesIncluded ? 'Recipient gets' : 'Amount'} />
+      <SimpleFeeBreakdown amount={feesIncluded ? amount - fee : amount} fee={fee} amountLabel={feesIncluded ? t('send.recipientGets') : t('send.amount')} />
 
       {/* Token conversion details */}
       {isTokenMode && tokenAmount && tokenFee && (
         <FeeBreakdownCard
           useRawStrings
           items={[
-            { label: 'Conversion amount', value: tokenAmount },
-            { label: 'Conversion fee', value: tokenFee },
+            { label: t('send.conversionAmount'), value: tokenAmount },
+            { label: t('send.conversionFee'), value: tokenFee },
           ]}
         />
       )}
@@ -83,7 +84,7 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ amountSats, feesSat, feesIncl
       <div className="flex gap-3">
         {onBack && (
           <SecondaryButton onClick={onBack} disabled={isLoading} className="flex-1">
-            Back
+            {t('back')}
           </SecondaryButton>
         )}
         <PrimaryButton
@@ -94,10 +95,10 @@ const ConfirmStep: React.FC<ConfirmStepProps> = ({ amountSats, feesSat, feesIncl
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
               <SpinnerIcon size="md" />
-              Processing...
+              {t('processing')}
             </span>
           ) : (
-            'Send'
+            t('send.send')
           )}
         </PrimaryButton>
       </div>
