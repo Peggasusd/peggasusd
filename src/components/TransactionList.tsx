@@ -8,6 +8,7 @@ import { useFiatData } from '../contexts/FiatDataContext';
 import { useContactsContext } from '../contexts/ContactsContext';
 import { formatTokenAmount, buildTokenDisplayConfig, tokenAmountDisplaysAsZero } from '../utils/tokenFormatting';
 import { getPaymentDescription } from '../utils/paymentDescription';
+import { t } from '../services/locale';
 
 // Use centralized formatting utility
 const formatWithSpaces = formatWithCommas;
@@ -26,12 +27,12 @@ const formatTimeAgo = (timestamp: number): string => {
   const now = Math.floor(Date.now() / 1000);
   const diffSeconds = now - timestamp;
 
-  if (diffSeconds < 60) return 'Just now';
-  if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)}m ago`;
-  if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)}h ago`;
-  if (diffSeconds < 2592000) return `${Math.floor(diffSeconds / 86400)}d ago`;
-  if (diffSeconds < 31536000) return `${Math.floor(diffSeconds / 2592000)}mo ago`;
-  return `${Math.floor(diffSeconds / 31536000)}y ago`;
+  if (diffSeconds < 60) return t('wallet.justNow');
+  if (diffSeconds < 3600) return t('wallet.minutesAgo', { m: Math.floor(diffSeconds / 60) });
+  if (diffSeconds < 86400) return t('wallet.hoursAgo', { h: Math.floor(diffSeconds / 3600) });
+  if (diffSeconds < 2592000) return t('wallet.daysAgo', { d: Math.floor(diffSeconds / 86400) });
+  if (diffSeconds < 31536000) return t('wallet.monthsAgo', { mo: Math.floor(diffSeconds / 2592000) });
+  return t('wallet.yearsAgo', { y: Math.floor(diffSeconds / 31536000) });
 };
 
 const getTransactionIcon = (payment: Payment): React.ReactNode => {
@@ -95,7 +96,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
       return (
         <div className="px-4 py-3 flex-1 overflow-hidden" style={{ maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}>
           <div className="flex items-center gap-2 mb-3">
-            <h2 className="text-sm font-semibold text-spark-text-muted tracking-wide uppercase">Payments</h2>
+            <h2 className="text-sm font-semibold text-spark-text-muted tracking-wide uppercase">{t('wallet.payments')}</h2>
             <div className="flex-1 h-px bg-linear-to-r from-spark-border to-transparent" />
           </div>
           <ul className="space-y-2">
@@ -111,9 +112,9 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
         <div className="w-20 h-20 rounded-2xl bg-spark-surface border border-spark-border flex items-center justify-center mb-6">
           {EmptyStateIcon}
         </div>
-        <h3 className="text-lg font-semibold text-spark-text-primary mb-2">No payments yet</h3>
+        <h3 className="text-lg font-semibold text-spark-text-primary mb-2">{t('wallet.noPayments')}</h3>
         <p className="text-spark-text-muted text-sm text-center max-w-xs">
-          Your payment history will appear here once you send or receive your first payment.
+          {t('wallet.noPaymentsDesc')}
         </p>
       </div>
     );
@@ -153,7 +154,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
             )}
             {isFailed && (
               <span className="shrink-0 px-1.5 py-0.5 rounded-sm bg-spark-error/15 text-spark-error text-[10px] font-medium uppercase">
-                Failed
+{t('wallet.failed')}
               </span>
             )}
           </div>
@@ -174,7 +175,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
               return (
                 <>
                   <span>·</span>
-                  <span>fee {feeText}</span>
+                  <span>{t('wallet.fee')} {feeText}</span>
                 </>
               );
             })()}
@@ -214,7 +215,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
         <>
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-semibold text-spark-text-muted tracking-wide uppercase">
-              Pending Confirmation
+              {t('wallet.pendingConfirmation')}
             </h2>
             <div className="flex-1 h-px bg-linear-to-r from-spark-border to-transparent" />
           </div>
@@ -229,7 +230,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
         <>
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-semibold text-spark-text-muted tracking-wide uppercase">
-              Pending Approval
+{t('wallet.pendingApproval')}
             </h2>
             <div className="flex-1 h-px bg-linear-to-r from-spark-border to-transparent" />
           </div>
@@ -244,7 +245,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ transactions, onPayme
         <>
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-semibold text-spark-text-muted tracking-wide uppercase">
-              Payments
+              {t('wallet.payments')}
             </h2>
             <div className="flex-1 h-px bg-linear-to-r from-spark-border to-transparent" />
           </div>
