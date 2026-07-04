@@ -5,6 +5,8 @@ node_modules/
 dist/
 .vercel
 .env*.local
+android/
+*.keystore
 
 # Lint output
 lint_output.txt

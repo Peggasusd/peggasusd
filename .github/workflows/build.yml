@@ -39,11 +39,19 @@ jobs:
         run: |
           sed -i 's/<application/<uses-permission android:name="android.permission.CAMERA"\/>\n<uses-feature android:name="android.hardware.camera" android:required="false"\/>\n<application/' android/app/src/main/AndroidManifest.xml
 
-      - name: Build APK (debug)
-        run: cd android && ./gradlew assembleDebug
+      - name: Configure release signing
+        run: node scripts/configure-release-signing.js
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Build APK (release)
+        run: cd android && ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: peggasusd-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/release/*.apk
