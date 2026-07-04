@@ -2,6 +2,15 @@ name: Build PEGGASUSD APK
 
 on:
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Tipo de build: debug o release'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
 
 jobs:
   build:
@@ -40,6 +49,7 @@ jobs:
           sed -i 's/<application/<uses-permission android:name="android.permission.CAMERA"\/>\n<uses-feature android:name="android.hardware.camera" android:required="false"\/>\n<application/' android/app/src/main/AndroidManifest.xml
 
       - name: Configure release signing
+        if: inputs.build_type == 'release'
         run: node scripts/configure-release-signing.js
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -47,11 +57,11 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Build APK (release)
-        run: cd android && ./gradlew assembleRelease
+      - name: Build APK
+        run: cd android && ./gradlew assemble${{ inputs.build_type == 'release' && 'Release' || 'Debug' }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: peggasusd-apk
-          path: android/app/build/outputs/apk/release/*.apk
+          name: peggasusd-apk-${{ inputs.build_type }}
+          path: android/app/build/outputs/apk/${{ inputs.build_type }}/*.apk
