@@ -12,6 +12,7 @@ import {
 } from '../services/passkeyService';
 import { useToast } from '@/contexts/ToastContext';
 import { logger, LogCategory } from '@/services/logger';
+import { t, TranslationKey } from '../services/locale';
 
 interface PasskeyLocalStatePageProps {
   onBack: () => void;
@@ -77,7 +78,7 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
     localStorage.removeItem('passkeyLastSeenAt');
     clearAllLabelLastUsed();
     logger.warn(LogCategory.AUTH, 'User cleared passkey history (kept credential IDs and AAGUIDs)');
-    showToast('success', 'Passkey history cleared');
+    showToast('success', t('passkey.historyCleared'));
     setConfirm(null);
     onCompleted();
   };
@@ -108,9 +109,9 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
     // Clear provider info option below targets that case explicitly.
     logger.warn(LogCategory.AUTH, 'User performed full passkey state wipe (kept AAGUIDs)');
     if (keychainCleared) {
-      showToast('success', 'Tracked passkeys wiped');
+      showToast('success', t('passkey.passkeysWiped'));
     } else {
-      showToast('error', 'Partial wipe', 'Tracked passkey IDs clear failed; check logs.');
+      showToast('error', t('passkey.partialWipe'), t('passkey.partialWipeMsg'));
     }
     setIsWorking(false);
     setConfirm(null);
@@ -125,18 +126,18 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
     // 'Passkey' label until each credential is re-created).
     clearAllCredentialAaguids();
     logger.warn(LogCategory.AUTH, 'User cleared provider info (AAGUID + BE)');
-    showToast('success', 'Provider info cleared');
+    showToast('success', t('passkey.providerInfoCleared'));
     setConfirm(null);
   };
 
-  const items: Array<{ kind: ConfirmKind; title: string }> = [
-    { kind: 'forget', title: 'Forget history' },
-    { kind: 'wipe', title: 'Wipe tracked passkeys' },
-    { kind: 'aaguids', title: 'Clear provider info' },
+  const items: Array<{ kind: ConfirmKind; titleKey: string }> = [
+    { kind: 'forget', titleKey: 'forgetHistory' },
+    { kind: 'wipe', titleKey: 'wipeTracked' },
+    { kind: 'aaguids', titleKey: 'clearProviderInfo' },
   ];
 
   return (
-    <SlideInPage title="Local State" closeStyle="back" onClose={onBack} slideFrom="right">
+    <SlideInPage title={t('passkey.localState')} closeStyle="back" onClose={onBack} slideFrom="right">
       <div className="p-4 space-y-2">
         {items.map((item) => (
           <button
@@ -149,7 +150,7 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
               <TrashIcon size="sm" className="text-spark-error" />
             </div>
             <div className="font-display font-semibold text-spark-text-primary">
-              {item.title}
+              {t(`passkey.${item.titleKey}` as TranslationKey)}
             </div>
           </button>
         ))}
@@ -157,10 +158,10 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
 
       <ConfirmDialog
         isOpen={confirm === 'forget'}
-        title="Forget history?"
-        message="PEGGASUSD signs you out and shows the new-user welcome screen. Tracked credential IDs and provider info are kept, so trying to create a new passkey is still refused by the OS as a duplicate."
-        confirmLabel="Forget"
-        cancelLabel="Cancel"
+        title={t('passkey.forgetHistoryTitle')}
+        message={t('passkey.forgetHistoryMsg')}
+        confirmLabel={t('passkey.forget')}
+        cancelLabel={t('cancel')}
         variant="warning"
         onConfirm={handleForget}
         onCancel={() => setConfirm(null)}
@@ -168,10 +169,10 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
 
       <ConfirmDialog
         isOpen={confirm === 'wipe'}
-        title="Wipe tracked passkeys?"
-        message={`PEGGASUSD signs you out and forgets the credential IDs it tracks on this device, the active selection, per-credential metadata, and the welcome-screen marker. Provider info (AAGUIDs) is kept. Your actual passkeys stay in ${copy.passkeyHome} until you remove them from ${copy.systemDelete}.`}
-        confirmLabel={isWorking ? 'Working…' : 'Wipe'}
-        cancelLabel="Cancel"
+        title={t('passkey.wipeTrackedTitle')}
+        message={t('passkey.wipeTrackedMsg', { passkeyHome: copy.passkeyHome, systemDelete: copy.systemDelete })}
+        confirmLabel={isWorking ? t('passkey.working') : t('passkey.wipe')}
+        cancelLabel={t('cancel')}
         variant="danger"
         onConfirm={handleWipe}
         onCancel={() => setConfirm(null)}
@@ -179,10 +180,10 @@ const PasskeyLocalStatePage: React.FC<PasskeyLocalStatePageProps> = ({ onBack, o
 
       <ConfirmDialog
         isOpen={confirm === 'aaguids'}
-        title="Clear provider info?"
-        message='PEGGASUSD forgets the provider name (AAGUID) and sync indicator for every known passkey. Sync indicator recovers on next sign-in. Provider name is captured at create time only, so existing passkeys will show "Passkey" on the management page until re-created.'
-        confirmLabel="Clear"
-        cancelLabel="Cancel"
+        title={t('passkey.clearProviderInfoTitle')}
+        message={t('passkey.clearProviderInfoMsg')}
+        confirmLabel={t('passkey.clear')}
+        cancelLabel={t('cancel')}
         variant="danger"
         onConfirm={handleClearAaguids}
         onCancel={() => setConfirm(null)}

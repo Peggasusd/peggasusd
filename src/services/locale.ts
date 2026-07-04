@@ -407,6 +407,56 @@ export type TranslationKey =
   | 'passkey.signInTimedOut'
   | 'passkey.signInCancelledErr'
   | 'passkey.failedToSaveLabel'
+  | 'passkey.localState'
+  | 'passkey.historyCleared'
+  | 'passkey.passkeysWiped'
+  | 'passkey.partialWipe'
+  | 'passkey.partialWipeMsg'
+  | 'passkey.providerInfoCleared'
+  | 'passkey.forgetHistory'
+  | 'passkey.wipeTracked'
+  | 'passkey.clearProviderInfo'
+  | 'passkey.forgetHistoryTitle'
+  | 'passkey.forgetHistoryMsg'
+  | 'passkey.forget'
+  | 'passkey.wipeTrackedTitle'
+  | 'passkey.wipeTrackedMsg'
+  | 'passkey.wipe'
+  | 'passkey.working'
+  | 'passkey.clearProviderInfoTitle'
+  | 'passkey.clearProviderInfoMsg'
+  | 'passkey.clear'
+  | 'passkey.spinnerVerifyingDomain'
+  | 'passkey.spinnerDetecting'
+  | 'passkey.spinnerDiscoveringLabels'
+  | 'passkey.spinnerInitializing'
+  | 'passkey.spinnerSavingLabel'
+  | 'passkey.spinnerStartingWallet'
+  | 'passkey.spinnerSettingUpBiometric'
+  | 'passkey.source'
+  | 'passkey.reason'
+  | 'passkey.failedToConnect'
+  | 'passkey.failedToConnectWithDetails'
+  | 'passkey.couldNotSignInRetry'
+  | 'passkey.couldNotSignInWithDetails'
+  | 'passkey.couldNotSignInSimple'
+  | 'passkey.signInCancelledPickPasskey'
+  | 'passkey.title'
+  | 'passkey.noPasskey'
+  | 'passkey.active'
+  | 'passkey.showPasskey'
+  | 'passkey.hidePasskey'
+  | 'passkey.sync'
+  | 'passkey.acrossDevices'
+  | 'passkey.thisDeviceOnly'
+  | 'passkey.firstSignIn'
+  | 'passkey.lastSignIn'
+  | 'passkey.useThisPasskey'
+  | 'passkey.useThisPasskeyTitle'
+  | 'passkey.useThisPasskeyMsg'
+  | 'passkey.switching'
+  | 'passkey.showHidden'
+  | 'passkey.hideHidden'
   // Stable Balance
   | 'stableBalance.title'
   | 'stableBalance.description'
@@ -460,6 +510,27 @@ export type TranslationKey =
   | 'sendCrossChain.amountTooLargeFull'
   | 'sendCrossChain.noQuoteFull'
   | 'sendCrossChain.failedToFetchRoutes'
+  // Labels
+  | 'labels.title'
+  | 'labels.noLabels'
+  | 'labels.noLabelsDesc'
+  | 'labels.currentlySignedIn'
+  | 'labels.lastUsed'
+  | 'labels.tapToSwitch'
+  | 'labels.addNew'
+  | 'labels.newLabelName'
+  | 'labels.placeholder'
+  | 'labels.duplicate'
+  | 'labels.switchTitle'
+  | 'labels.switchMsg'
+  | 'labels.switchLabel'
+  | 'labels.labelAdded'
+  | 'labels.labelAddedMsg'
+  | 'labels.couldNotAdd'
+  | 'labels.couldNotSwitch'
+  | 'labels.couldNotLoad'
+  | 'labels.saving'
+  | 'labels.save'
   // LnurlAuth
   | 'lnurlAuth.register'
   | 'lnurlAuth.logIn'
@@ -475,6 +546,24 @@ export type TranslationKey =
   | 'staging.enterPassword'
   | 'staging.continue'
   | 'staging.incorrectPassword'
+  | 'sdk.failedRefresh'
+  | 'sdk.depositsClaimed'
+  | 'sdk.depositsClaimedMsg'
+  | 'sdk.failedToClaim'
+  | 'sdk.failedToClaimMsg'
+  | 'sdk.missingApiKey'
+  | 'sdk.missingApiKeyMsg'
+  | 'sdk.failedToConnect'
+  | 'sdk.loggedOut'
+  | 'sdk.failedSwitch'
+  | 'sdk.biometricLockout'
+  | 'sdk.enrollmentChanged'
+  | 'sdk.notEnrolled'
+  | 'sdk.biometricUnavailable'
+  | 'sdk.unableToUnlock'
+  | 'sdk.failedMnemonic'
+  | 'sdk.failedPasskeyAuth'
+  | 'sdk.failedEventListeners'
   // Lock
   | 'lock.title'
   | 'lock.unlockWith'
@@ -886,6 +975,56 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'passkey.signInTimedOut': 'Sign-in timed out. Please try again.',
     'passkey.signInCancelledErr': 'Sign-in cancelled. Please try again.',
     'passkey.failedToSaveLabel': 'Failed to save label to Nostr',
+    'passkey.localState': 'Local State',
+    'passkey.historyCleared': 'Passkey history cleared',
+    'passkey.passkeysWiped': 'Tracked passkeys wiped',
+    'passkey.partialWipe': 'Partial wipe',
+    'passkey.partialWipeMsg': 'Tracked passkey IDs clear failed; check logs.',
+    'passkey.providerInfoCleared': 'Provider info cleared',
+    'passkey.forgetHistory': 'Forget history',
+    'passkey.wipeTracked': 'Wipe tracked passkeys',
+    'passkey.clearProviderInfo': 'Clear provider info',
+    'passkey.forgetHistoryTitle': 'Forget history?',
+    'passkey.forgetHistoryMsg': "PEGGASUSD signs you out and shows the new-user welcome screen. Tracked credential IDs and provider info are kept, so trying to create a new passkey is still refused by the OS as a duplicate.",
+    'passkey.forget': 'Forget',
+    'passkey.wipeTrackedTitle': 'Wipe tracked passkeys?',
+    'passkey.wipeTrackedMsg': "PEGGASUSD signs you out and forgets the credential IDs it tracks on this device, the active selection, per-credential metadata, and the welcome-screen marker. Provider info (AAGUIDs) is kept. Your actual passkeys stay in {passkeyHome} until you remove them from {systemDelete}.",
+    'passkey.wipe': 'Wipe',
+    'passkey.working': 'Working\u2026',
+    'passkey.clearProviderInfoTitle': 'Clear provider info?',
+    'passkey.clearProviderInfoMsg': "PEGGASUSD forgets the provider name (AAGUID) and sync indicator for every known passkey. Sync indicator recovers on next sign-in. Provider name is captured at create time only, so existing passkeys will show \"Passkey\" on the management page until re-created.",
+    'passkey.clear': 'Clear',
+    'passkey.spinnerVerifyingDomain': 'Verifying app domain...',
+    'passkey.spinnerDetecting': 'Detecting passkey...',
+    'passkey.spinnerDiscoveringLabels': 'Discovering labels...',
+    'passkey.spinnerInitializing': 'Initializing passkey...',
+    'passkey.spinnerSavingLabel': 'Saving label...',
+    'passkey.spinnerStartingWallet': 'Starting PEGGASUSD...',
+    'passkey.spinnerSettingUpBiometric': 'Setting up biometric unlock...',
+    'passkey.source': 'Source:',
+    'passkey.reason': 'Reason:',
+    'passkey.failedToConnect': 'Failed to connect.',
+    'passkey.failedToConnectWithDetails': 'Failed to connect. [{details}]',
+    'passkey.couldNotSignInRetry': 'Could not sign in with your passkey. Please try again.',
+    'passkey.couldNotSignInWithDetails': 'Could not sign in with your passkey. [{details}] Please try again.',
+    'passkey.couldNotSignInSimple': 'Could not sign in. Please try again.',
+    'passkey.signInCancelledPickPasskey': 'Sign-in cancelled. Please pick your passkey to continue.',
+    'passkey.title': 'Passkey',
+    'passkey.noPasskey': 'No passkey',
+    'passkey.active': 'Active',
+    'passkey.showPasskey': 'Show this passkey',
+    'passkey.hidePasskey': 'Hide this passkey',
+    'passkey.sync': 'Sync',
+    'passkey.acrossDevices': 'Across your devices',
+    'passkey.thisDeviceOnly': 'This device only',
+    'passkey.firstSignIn': 'First sign-in',
+    'passkey.lastSignIn': 'Last sign-in',
+    'passkey.useThisPasskey': 'Use this passkey',
+    'passkey.useThisPasskeyTitle': 'Use this passkey?',
+    'passkey.useThisPasskeyMsg': 'PEGGASUSD will sign you in with the selected passkey.',
+    'passkey.switching': 'Switching\u2026',
+    'passkey.showHidden': 'Show {count} hidden',
+    'passkey.hideHidden': 'Hide {count} hidden',
     // Stable Balance
     'stableBalance.title': 'Stable Balance',
     'stableBalance.description': 'Your balance is held in USD and automatically converts to BTC when you make a Lightning payment.',
@@ -939,6 +1078,27 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'sendCrossChain.amountTooLargeFull': 'This amount is too large for the available routes. Try sending a smaller amount.',
     'sendCrossChain.noQuoteFull': "Couldn't get a quote from any provider right now. Try again, or go back and use a different amount.",
     'sendCrossChain.failedToFetchRoutes': 'Failed to fetch routes: {error}',
+    // Labels
+    'labels.title': 'Labels',
+    'labels.noLabels': 'No labels yet',
+    'labels.noLabelsDesc': 'Add a label to organize multiple wallets under this passkey.',
+    'labels.currentlySignedIn': 'Currently signed in',
+    'labels.lastUsed': 'Last used {time}',
+    'labels.tapToSwitch': 'Tap to switch',
+    'labels.addNew': 'Add new label',
+    'labels.newLabelName': 'New label name',
+    'labels.placeholder': 'e.g. Savings',
+    'labels.duplicate': 'A label with this name already exists.',
+    'labels.switchTitle': 'Switch label?',
+    'labels.switchMsg': 'PEGGASUSD will reconnect using "{label}". You\'ll be asked to authenticate with your passkey.',
+    'labels.switchLabel': 'Switch',
+    'labels.labelAdded': 'Label added',
+    'labels.labelAddedMsg': '"{label}" is now available on this passkey.',
+    'labels.couldNotAdd': "Couldn't add label",
+    'labels.couldNotSwitch': "Couldn't switch label",
+    'labels.couldNotLoad': "Couldn't load labels",
+    'labels.saving': 'Saving\u2026',
+    'labels.save': 'Save',
     // LnurlAuth
     'lnurlAuth.register': 'Register',
     'lnurlAuth.logIn': 'Log in',
@@ -954,6 +1114,25 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'staging.enterPassword': 'Enter password',
     'staging.continue': 'Continue',
     'staging.incorrectPassword': 'Incorrect password',
+    // SDK
+    'sdk.failedRefresh': 'Failed to refresh wallet data.',
+    'sdk.depositsClaimed': 'Deposits Claimed Successfully',
+    'sdk.depositsClaimedMsg': '{count} deposits were claimed',
+    'sdk.failedToClaim': 'Failed to Claim Deposits',
+    'sdk.failedToClaimMsg': '{count} deposits could not be claimed',
+    'sdk.missingApiKey': 'Missing API Key',
+    'sdk.missingApiKeyMsg': 'Please add VITE_BREEZ_API_KEY to your .env file',
+    'sdk.failedToConnect': 'Failed to connect wallet. Please try again.',
+    'sdk.loggedOut': 'Successfully logged out',
+    'sdk.failedSwitch': 'Failed to switch label. Please try again.',
+    'sdk.biometricLockout': 'Biometric unlock is locked. Unlock your device with your passcode and try again.',
+    'sdk.enrollmentChanged': 'Your biometric enrollment changed. Please set up your wallet again.',
+    'sdk.notEnrolled': 'Biometric authentication is not set up on this device.',
+    'sdk.biometricUnavailable': 'Biometric authentication is unavailable. Please enable Face ID / Touch ID / fingerprint in your device settings and try again.',
+    'sdk.unableToUnlock': 'Unable to unlock wallet. Please try again.',
+    'sdk.failedMnemonic': 'Failed to connect with saved mnemonic. Please try again.',
+    'sdk.failedPasskeyAuth': 'Failed to authenticate with passkey. Please try again.',
+    'sdk.failedEventListeners': 'Failed to set up event listeners.',
     // Lock
     'lock.title': 'App Locked',
     'lock.unlockWith': 'Unlock with',
@@ -1365,6 +1544,56 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'passkey.signInTimedOut': 'La solicitud de inicio de sesión expiró. Intenta de nuevo.',
     'passkey.signInCancelledErr': 'Inicio de sesión cancelado. Intenta de nuevo.',
     'passkey.failedToSaveLabel': 'Error al guardar la etiqueta en Nostr',
+    'passkey.localState': 'Estado local',
+    'passkey.historyCleared': 'Historial de passkey limpiado',
+    'passkey.passkeysWiped': 'Passkeys rastreadas limpiadas',
+    'passkey.partialWipe': 'Limpieza parcial',
+    'passkey.partialWipeMsg': 'Fallo al limpiar IDs de passkey rastreadas; revisa logs.',
+    'passkey.providerInfoCleared': 'Información de proveedor limpiada',
+    'passkey.forgetHistory': 'Olvidar historial',
+    'passkey.wipeTracked': 'Limpiar passkeys rastreadas',
+    'passkey.clearProviderInfo': 'Limpiar info de proveedor',
+    'passkey.forgetHistoryTitle': '¿Olvidar historial?',
+    'passkey.forgetHistoryMsg': "PEGGASUSD cierra tu sesión y muestra la pantalla de bienvenida. Los IDs de credenciales rastreadas e info de proveedor se conservan, por lo que crear una nueva passkey seguirá siendo rechazado por el sistema como duplicado.",
+    'passkey.forget': 'Olvidar',
+    'passkey.wipeTrackedTitle': '¿Limpiar passkeys rastreadas?',
+    'passkey.wipeTrackedMsg': "PEGGASUSD cierra tu sesión y olvida los IDs de credenciales que rastrea en este dispositivo, la selección activa, metadatos por credencial y el marcador de pantalla de bienvenida. La info de proveedor (AAGUIDs) se conserva. Tus passkeys reales permanecen en {passkeyHome} hasta que las elimines desde {systemDelete}.",
+    'passkey.wipe': 'Limpiar',
+    'passkey.working': 'Trabajando\u2026',
+    'passkey.clearProviderInfoTitle': '¿Limpiar info de proveedor?',
+    'passkey.clearProviderInfoMsg': "PEGGASUSD olvida el nombre del proveedor (AAGUID) y el indicador de sincronización de cada passkey conocida. El indicador de sincronización se recupera en el próximo inicio de sesión. El nombre del proveedor se captura solo al crear, por lo que las passkeys existentes mostrarán \"Passkey\" en la página de gestión hasta que se vuelvan a crear.",
+    'passkey.clear': 'Limpiar',
+    'passkey.spinnerVerifyingDomain': 'Verificando dominio...',
+    'passkey.spinnerDetecting': 'Detectando passkey...',
+    'passkey.spinnerDiscoveringLabels': 'Descubriendo etiquetas...',
+    'passkey.spinnerInitializing': 'Inicializando passkey...',
+    'passkey.spinnerSavingLabel': 'Guardando etiqueta...',
+    'passkey.spinnerStartingWallet': 'Iniciando PEGGASUSD...',
+    'passkey.spinnerSettingUpBiometric': 'Configurando desbloqueo biométrico...',
+    'passkey.source': 'Fuente:',
+    'passkey.reason': 'Razón:',
+    'passkey.failedToConnect': 'Error al conectar.',
+    'passkey.failedToConnectWithDetails': 'Error al conectar. [{details}]',
+    'passkey.couldNotSignInRetry': 'No se pudo iniciar sesión con tu passkey. Intenta de nuevo.',
+    'passkey.couldNotSignInWithDetails': 'No se pudo iniciar sesión con tu passkey. [{details}] Intenta de nuevo.',
+    'passkey.couldNotSignInSimple': 'No se pudo iniciar sesión. Intenta de nuevo.',
+    'passkey.signInCancelledPickPasskey': 'Inicio de sesión cancelado. Elige tu passkey para continuar.',
+    'passkey.title': 'Passkey',
+    'passkey.noPasskey': 'Sin passkey',
+    'passkey.active': 'Activa',
+    'passkey.showPasskey': 'Mostrar esta passkey',
+    'passkey.hidePasskey': 'Ocultar esta passkey',
+    'passkey.sync': 'Sincronización',
+    'passkey.acrossDevices': 'En todos tus dispositivos',
+    'passkey.thisDeviceOnly': 'Solo este dispositivo',
+    'passkey.firstSignIn': 'Primer inicio',
+    'passkey.lastSignIn': 'Último inicio',
+    'passkey.useThisPasskey': 'Usar esta passkey',
+    'passkey.useThisPasskeyTitle': '¿Usar esta passkey?',
+    'passkey.useThisPasskeyMsg': 'PEGGASUSD iniciará sesión con la passkey seleccionada.',
+    'passkey.switching': 'Cambiando\u2026',
+    'passkey.showHidden': 'Mostrar {count} ocultas',
+    'passkey.hideHidden': 'Ocultar {count} ocultas',
     // Stable Balance
     'stableBalance.title': 'Saldo estable',
     'stableBalance.description': 'Tu saldo se mantiene en USD y se convierte automáticamente a BTC cuando realizas un pago Lightning.',
@@ -1418,6 +1647,27 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'sendCrossChain.amountTooLargeFull': 'Esta cantidad es demasiado grande para las rutas disponibles. Intenta enviar una cantidad menor.',
     'sendCrossChain.noQuoteFull': 'No se pudo obtener cotización de ningún proveedor. Intenta de nuevo o cambia la cantidad.',
     'sendCrossChain.failedToFetchRoutes': 'Error al obtener rutas: {error}',
+    // Labels
+    'labels.title': 'Etiquetas',
+    'labels.noLabels': 'Aún no hay etiquetas',
+    'labels.noLabelsDesc': 'Añade una etiqueta para organizar múltiples billeteras bajo esta passkey.',
+    'labels.currentlySignedIn': 'Conectada actualmente',
+    'labels.lastUsed': 'Último uso {time}',
+    'labels.tapToSwitch': 'Toca para cambiar',
+    'labels.addNew': 'Añadir nueva etiqueta',
+    'labels.newLabelName': 'Nuevo nombre de etiqueta',
+    'labels.placeholder': 'ej. Ahorros',
+    'labels.duplicate': 'Ya existe una etiqueta con este nombre.',
+    'labels.switchTitle': '¿Cambiar etiqueta?',
+    'labels.switchMsg': 'PEGGASUSD se reconectará usando "{label}". Se te pedirá autenticarte con tu passkey.',
+    'labels.switchLabel': 'Cambiar',
+    'labels.labelAdded': 'Etiqueta añadida',
+    'labels.labelAddedMsg': '"{label}" ya está disponible en esta passkey.',
+    'labels.couldNotAdd': 'No se pudo añadir la etiqueta',
+    'labels.couldNotSwitch': 'No se pudo cambiar la etiqueta',
+    'labels.couldNotLoad': 'No se pudieron cargar las etiquetas',
+    'labels.saving': 'Guardando\u2026',
+    'labels.save': 'Guardar',
     // LnurlAuth
     'lnurlAuth.register': 'Registrarse',
     'lnurlAuth.logIn': 'Iniciar sesión',
@@ -1433,6 +1683,25 @@ const translations: Record<Locale, Record<TranslationKey, string>> = {
     'staging.enterPassword': 'Introduce la contraseña',
     'staging.continue': 'Continuar',
     'staging.incorrectPassword': 'Contraseña incorrecta',
+    // SDK
+    'sdk.failedRefresh': 'Error al actualizar datos de la billetera.',
+    'sdk.depositsClaimed': 'Depósitos reclamados exitosamente',
+    'sdk.depositsClaimedMsg': '{count} depósitos fueron reclamados',
+    'sdk.failedToClaim': 'Error al reclamar depósitos',
+    'sdk.failedToClaimMsg': '{count} depósitos no pudieron ser reclamados',
+    'sdk.missingApiKey': 'API Key faltante',
+    'sdk.missingApiKeyMsg': 'Añade VITE_BREEZ_API_KEY a tu archivo .env',
+    'sdk.failedToConnect': 'Error al conectar la billetera. Intenta de nuevo.',
+    'sdk.loggedOut': 'Sesión cerrada exitosamente',
+    'sdk.failedSwitch': 'Error al cambiar etiqueta. Intenta de nuevo.',
+    'sdk.biometricLockout': 'El desbloqueo biométrico está bloqueado. Desbloquea tu dispositivo con tu código y prueba de nuevo.',
+    'sdk.enrollmentChanged': 'Tu registro biométrico cambió. Configura tu billetera de nuevo.',
+    'sdk.notEnrolled': 'La autenticación biométrica no está configurada en este dispositivo.',
+    'sdk.biometricUnavailable': 'La autenticación biométrica no está disponible. Activa Face ID / Touch ID / huella digital en la configuración de tu dispositivo.',
+    'sdk.unableToUnlock': 'No se pudo desbloquear la billetera. Intenta de nuevo.',
+    'sdk.failedMnemonic': 'Error al conectar con la semilla guardada. Intenta de nuevo.',
+    'sdk.failedPasskeyAuth': 'Error al autenticar con passkey. Intenta de nuevo.',
+    'sdk.failedEventListeners': 'Error al configurar los listeners de eventos.',
     // Lock
     'lock.title': 'App Bloqueada',
     'lock.unlockWith': 'Desbloquear con',

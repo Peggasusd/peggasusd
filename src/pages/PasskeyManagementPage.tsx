@@ -13,6 +13,7 @@ import {
   hasPasskeyHistory,
 } from '../services/passkeyService';
 import { lookupAaguid, type AaguidProvider } from '../services/aaguidLookup';
+import { t } from '../services/locale';
 
 interface PasskeyManagementPageProps {
   onBack: () => void;
@@ -142,7 +143,7 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
   // Pre-onboarding shell: show the original empty card.
   if (!registered || rows.length === 0) {
     return (
-      <SlideInPage title="Passkey" closeStyle="back" onClose={onBack} slideFrom="right">
+      <SlideInPage title={t('passkey.title')} closeStyle="back" onClose={onBack} slideFrom="right">
         <div className="p-4">
           <div className="bg-spark-dark border border-spark-border rounded-2xl p-4">
             <div className="flex items-center gap-3">
@@ -151,7 +152,7 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-display font-semibold text-spark-text-primary">
-                  No passkey
+                  {t('passkey.noPasskey')}
                 </div>
               </div>
             </div>
@@ -162,7 +163,7 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
   }
 
   return (
-    <SlideInPage title="Passkey" closeStyle="back" onClose={onBack} slideFrom="right">
+    <SlideInPage title={t('passkey.title')} closeStyle="back" onClose={onBack} slideFrom="right">
       <div className="p-4 space-y-3">
         {visibleRows.map((row) => {
           const isActive = row.credentialId === activeCredId;
@@ -204,7 +205,7 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
           } else {
             // Neither provider nor cached user.name — only stable
             // handle is the cred ID short form.
-            title = 'Passkey';
+            title = t('passkey.title');
             subtitle = shortCredId(row.credentialId);
           }
           const handleRowClick = () => {
@@ -253,7 +254,7 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
                     <span className="truncate">{title}</span>
                     {isActive && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-spark-primary bg-spark-primary/15 px-1.5 py-0.5 rounded">
-                        <CheckIcon size="xs" /> Active
+                        <CheckIcon size="xs" /> {t('passkey.active')}
                       </span>
                     )}
                   </div>
@@ -267,8 +268,8 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
                   <button
                     type="button"
                     onClick={toggleHidden}
-                    aria-label={row.hidden ? 'Show this passkey' : 'Hide this passkey'}
-                    title={row.hidden ? 'Show this passkey' : 'Hide this passkey'}
+                    aria-label={row.hidden ? t('passkey.showPasskey') : t('passkey.hidePasskey')}
+                    title={row.hidden ? t('passkey.showPasskey') : t('passkey.hidePasskey')}
                     className="shrink-0 p-2 rounded-lg text-spark-text-muted hover:text-spark-text-secondary hover:bg-white/5 transition-colors"
                   >
                     {row.hidden ? <EyeOffIcon size="sm" /> : <EyeIcon size="sm" />}
@@ -280,19 +281,19 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
                 <div className="mt-4 border-t border-spark-border pt-3 space-y-1.5">
                   {row.backupEligible !== undefined && (
                     <div className="flex items-center justify-between gap-3 text-xs text-spark-text-muted">
-                      <span>Sync</span>
-                      <span>{row.backupEligible ? 'Across your devices' : 'This device only'}</span>
+                      <span>{t('passkey.sync')}</span>
+                      <span>{row.backupEligible ? t('passkey.acrossDevices') : t('passkey.thisDeviceOnly')}</span>
                     </div>
                   )}
                   {row.firstSeenAt && (
                     <div className="flex items-center justify-between gap-3 text-xs text-spark-text-muted">
-                      <span>First sign-in</span>
+                      <span>{t('passkey.firstSignIn')}</span>
                       <span>{formatTimestamp(row.firstSeenAt)}</span>
                     </div>
                   )}
                   {row.lastSeenAt && (
                     <div className="flex items-center justify-between gap-3 text-xs text-spark-text-muted">
-                      <span>Last sign-in</span>
+                      <span>{t('passkey.lastSignIn')}</span>
                       <span>{formatTimestamp(row.lastSeenAt)}</span>
                     </div>
                   )}
@@ -309,18 +310,18 @@ const PasskeyManagementPage: React.FC<PasskeyManagementPageProps> = ({
             className="w-full py-2 text-xs text-spark-text-muted hover:text-spark-text-secondary transition-colors"
           >
             {showHidden
-              ? `Hide ${hiddenCount} hidden ${hiddenCount === 1 ? 'passkey' : 'passkeys'}`
-              : `Show ${hiddenCount} hidden ${hiddenCount === 1 ? 'passkey' : 'passkeys'}`}
+              ? t('passkey.hideHidden', { count: hiddenCount })
+              : t('passkey.showHidden', { count: hiddenCount })}
           </button>
         )}
       </div>
 
       <ConfirmDialog
         isOpen={pendingSwitchCredId !== null}
-        title="Use this passkey?"
-        message="PEGGASUSD will sign you in with the selected passkey."
-        confirmLabel={isSwitching ? 'Switching…' : 'Use this passkey'}
-        cancelLabel="Cancel"
+        title={t('passkey.useThisPasskeyTitle')}
+        message={t('passkey.useThisPasskeyMsg')}
+        confirmLabel={isSwitching ? t('passkey.switching') : t('passkey.useThisPasskey')}
+        cancelLabel={t('cancel')}
         variant="default"
         onConfirm={handleConfirmSwitch}
         onCancel={() => { if (!isSwitching) setPendingSwitchCredId(null); }}

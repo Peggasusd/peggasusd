@@ -30,6 +30,7 @@ import {
 import { logger, LogCategory } from '@/services/logger';
 import { shareOrDownloadLogs } from '@/services/logExport';
 import { useLatest } from '../hooks/useLatest';
+import { t } from '../services/locale';
 
 /**
  * Phase state machine. AASA gates both paths; detecting drives the
@@ -333,7 +334,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               }
               localStorage.setItem('passkeyActiveCredentialId', restoreCredId);
               if (cancelled) return;
-              setError("That passkey is no longer on this device.");
+              setError(t('passkey.notOnDevice'));
               setErrorKind('switch-recovery');
               return;
             }
@@ -345,9 +346,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             });
             await clearPasskeyHistory();
             if (cancelled) return;
-            setError(
-              'Your PEGGASUSD passkey is no longer on this device. You can create a new one.',
-            );
+            setError(t('passkey.passkeyRemoved'));
             setErrorKind('sign-in-failed');
             setPhase('review');
             return;
@@ -357,9 +356,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             // The cred is still on the device; auto-clearing would
             // lure a duplicate. Stay on detecting with a retryable error.
             logger.warn(LogCategory.AUTH, 'Slow CREDENTIAL_NOT_FOUND on returning user, surfacing retryable error');
-            setError(
-              'Could not find your PEGGASUSD passkey on this device. Try again, or check Settings → Passwords.',
-            );
+            setError(t('passkey.couldNotFind'));
             setErrorKind('sign-in-failed');
             return;
           }
@@ -396,7 +393,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               if (cancelled) return;
               setFailingSwitchCredId(failingCredId);
               setConfirmedStaleRemoval(false);
-              setError("Could not sign in with that passkey. It may have been removed, or the prompt was cancelled.");
+              setError(t('passkey.couldNotSignIn'));
               setErrorKind('switch-recovery');
               return;
             }
@@ -411,13 +408,13 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             error: underlying,
             elapsedMs,
           });
-          setError(
-            isCancelled
-              ? (isLikelyTimeout(elapsedMs)
-                ? 'Sign-in timed out. Please try again.'
-                : 'Sign-in cancelled. Please try again.')
-              : `Could not sign in with your passkey. ${underlying ? `[${underlying}]` : ''} Please try again.`,
-          );
+          if (isCancelled) {
+            setError(isLikelyTimeout(elapsedMs) ? t('passkey.signInTimedOut') : t('passkey.signInCancelledErr'));
+          } else if (underlying) {
+            setError(t('passkey.couldNotSignInWithDetails', { details: underlying }));
+          } else {
+            setError(t('passkey.couldNotSignInRetry'));
+          }
           setErrorKind('sign-in-failed');
           return;
         }
@@ -459,8 +456,8 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             });
             setError(
               isLikelyTimeout(elapsedMs)
-                ? 'Sign-in timed out. Please try again.'
-                : 'Sign-in cancelled. Please pick your passkey to continue.',
+                ? t('passkey.signInTimedOut')
+                : t('passkey.signInCancelledPickPasskey'),
             );
             setErrorKind('sign-in-cancelled');
           } else {
@@ -470,8 +467,8 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             });
             setError(
               isLikelyTimeout(elapsedMs)
-                ? 'Sign-in timed out. Please try again.'
-                : 'Could not sign in. Please try again.',
+                ? t('passkey.signInTimedOut')
+                : t('passkey.couldNotSignInSimple'),
             );
             setErrorKind(null);
           }
@@ -482,7 +479,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
           errorCode,
           elapsedMs,
         });
-        setError('Could not sign in with your passkey. Please try again.');
+        setError(t('passkey.couldNotSignInRetry'));
         setErrorKind(null);
       }
     };
@@ -532,7 +529,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
         setPhase('connecting');
       } catch (e) {
         if (cancelled) return;
-        setError('Failed to save label to Nostr');
+        setError(t('passkey.failedToSaveLabel'));
         setErrorKind('generic');
         logger.error(LogCategory.AUTH, 'Failed to save label', {
           error: e instanceof Error ? e.message : String(e),
@@ -628,7 +625,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             setIsNewUser(false);
             detectingFailCountRef.current = 0;
             setPhase('creating');
-            setError('You already have a PEGGASUSD passkey on this device. Use it to sign in.');
+            setError(t('passkey.alreadyExists'));
             setErrorKind('already-exists');
             return;
           }
@@ -649,11 +646,13 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
         );
         console.error('[Glow] Connect failed', { error: underlying, errorCode, elapsedMs, raw: e });
         if (isTimedOut || (isCancelled && isLikelyTimeout(elapsedMs))) {
-          setError('Sign-in timed out. Please try again.');
+          setError(t('passkey.signInTimedOut'));
         } else if (isCancelled) {
-          setError('Sign-in cancelled. Please try again.');
+          setError(t('passkey.signInCancelledErr'));
+        } else if (underlying) {
+          setError(t('passkey.failedToConnectWithDetails', { details: underlying }));
         } else {
-          setError(`Failed to connect. ${underlying ? `[${underlying}]` : ''}`);
+          setError(t('passkey.failedToConnect'));
         }
         setErrorKind('generic');
         logger.error(LogCategory.AUTH, 'Passkey wallet restore failed', {
@@ -704,16 +703,16 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
 
       <div className="text-center mb-4">
         <h2 className="text-xl font-display font-bold text-spark-text-primary mb-2">
-          Create your passkey
+          {t('passkey.createYourPasskey')}
         </h2>
         <p className="text-spark-text-secondary">
-          A passkey will be created on your device to secure your funds.
+          {t('passkey.secureFunds')}
         </p>
       </div>
 
-      <AlertCard variant="warning" title="Your passkey is how you access your funds">
+      <AlertCard variant="warning" title={t('passkey.alertTitle')}>
         <p className="text-spark-text-secondary text-sm">
-          Deleting your passkey from your device, browser, or password manager may make your funds permanently inaccessible.
+          {t('passkey.alertText')}
         </p>
       </AlertCard>
 
@@ -738,10 +737,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
 
         <div className="text-center mb-4">
           <h2 className="text-xl font-display font-bold text-spark-text-primary mb-2">
-            Select a label
+            {t('passkey.selectLabel')}
           </h2>
           <p className="text-spark-text-secondary text-sm">
-            Select an existing label or create a new one to connect with.
+            {t('passkey.selectLabelDesc')}
           </p>
         </div>
 
@@ -783,14 +782,14 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               className="w-full p-4 rounded-2xl border bg-spark-dark border-spark-border hover:border-spark-border-light text-left transition-all"
             >
               <span className="text-sm font-medium text-spark-text-secondary">
-                Create a new label...
+                {t('passkey.createNewLabel')}
               </span>
             </button>
           ) : (
             <div className="w-full p-4 rounded-2xl border transition-all bg-spark-primary/10 border-spark-primary">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-spark-text-secondary">
-                  Create a new label
+                  {t('passkey.createNewLabel')}
                 </span>
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center ${trimmedManual && !isDuplicate ? 'bg-spark-primary' : 'bg-transparent'}`}>
                   {trimmedManual && !isDuplicate && (
@@ -807,14 +806,14 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
                     setManualLabel(val);
                   }
                 }}
-                placeholder="Label name"
+                placeholder={t('passkey.labelName')}
                 maxLength={24}
                 className="w-full bg-spark-surface rounded-xl px-3 py-2 text-spark-text-primary placeholder:text-spark-text-muted focus:outline-hidden focus:ring-2 focus:ring-spark-primary/50 text-sm"
                 autoFocus
               />
               {isDuplicate && (
                 <p className="text-red-400 text-xs mt-1">
-                  A label with this name already exists
+                  {t('passkey.labelExists')}
                 </p>
               )}
             </div>
@@ -845,61 +844,56 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-semibold text-spark-text-primary">
-          Passkey verification failed
+          {t('passkey.verificationFailed')}
         </h2>
         <p className="text-spark-text-secondary">
-          This device can't complete a passkey ceremony until the app's
-          domain configuration is recognized.
+          {t('passkey.verificationDesc')}
         </p>
       </div>
       {aasaFailure && (
-        <AlertCard variant="warning" title="Diagnostic details">
+        <AlertCard variant="warning" title={t('passkey.diagnosticDetails')}>
           {/* break-all is required here: wrap-break-word only splits at
               word boundaries and can't break tokens like
               `delegate_permission/common.get_login_creds`. */}
           <div className="space-y-2 text-sm break-all min-w-0">
             <p>
-              <span className="font-semibold">Source:</span>{' '}
+              <span className="font-semibold">{t('passkey.source')}</span>{' '}
               {aasaFailure.source}
             </p>
             <p>
-              <span className="font-semibold">Reason:</span>{' '}
+              <span className="font-semibold">{t('passkey.reason')}</span>{' '}
               {aasaFailure.reason}
             </p>
           </div>
         </AlertCard>
       )}
       <p className="text-xs text-spark-text-secondary text-center px-2">
-        This typically happens when the app's domain configuration was
-        recently deployed and the platform's verification cache hasn't
-        refreshed, or when the configuration is missing entirely. There's
-        no guaranteed refresh time. Retry periodically, or share logs so
-        the team can check server-side state.
+        {t('passkey.diagnosticInfo')}
       </p>
     </div>
   );
 
   const content = (() => {
     switch (phase) {
-      case 'aasa-checking': return renderSpinner('Verifying app domain...');
+      case 'aasa-checking': return renderSpinner(t('passkey.spinnerVerifyingDomain'));
       case 'aasa-error': return renderAasaError();
       case 'detecting': return error
         ? null
-        : renderSpinner(isDiscoveringLabels ? 'Discovering labels...' : 'Detecting passkey...');
+        : renderSpinner(isDiscoveringLabels ? t('passkey.spinnerDiscoveringLabels') : t('passkey.spinnerDetecting'));
       case 'review': return error ? null : renderReview();
-      case 'creating': return error ? null : renderSpinner('Initializing passkey...');
+      case 'creating': return error ? null : renderSpinner(t('passkey.spinnerInitializing'));
       case 'new-storing':
         if (error) return null;
-        return renderSpinner('Saving label...');
+        return renderSpinner(t('passkey.spinnerSavingLabel'));
       case 'auth-pick': return renderAuthPick();
       case 'connecting':
         if (error) return null;
-        return renderSpinner('Starting PEGGASUSD...');
+        return renderSpinner(t('passkey.spinnerStartingWallet'));
       case 'initializing':
         // `secureStorage.storeSeed` triggers a second biometric prompt
         // to bind the seed; swap the label so it has visible context.
         return renderSpinner(
-          isSecuringSeed ? 'Setting up biometric unlock...' : 'Starting PEGGASUSD...',
+          isSecuringSeed ? t('passkey.spinnerSettingUpBiometric') : t('passkey.spinnerStartingWallet'),
         );
     }
   })();
@@ -917,7 +911,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               setPhase('aasa-checking');
             }}
           >
-            Retry Check
+            {t('passkey.retryCheck')}
           </PrimaryButton>
           <SecondaryButton
             className="w-full"
@@ -929,10 +923,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               });
             }}
           >
-            Share Diagnostic Logs
+            {t('passkey.shareDiagnostics')}
           </SecondaryButton>
           <SecondaryButton className="w-full" onClick={onBack}>
-            Go Back
+            {t('goBack')}
           </SecondaryButton>
         </div>
       );
@@ -950,7 +944,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             setErrorKind(null);
             setPhase('aasa-checking');
           }}>
-            Try Again
+            {t('tryAgain')}
           </PrimaryButton>
         </div>
       );
@@ -981,7 +975,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             setErrorKind(null);
             setPhase('aasa-checking');
           }}>
-            Continue
+            {t('continue')}
           </PrimaryButton>
         </div>
       );
@@ -1001,7 +995,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             setErrorKind(null);
             setPhase('aasa-checking');
           }}>
-            Try Again
+            {t('tryAgain')}
           </PrimaryButton>
           {isWeb && (
             <SecondaryButton className="w-full" onClick={() => {
@@ -1013,7 +1007,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               setErrorKind(null);
               setPhase('aasa-checking');
             }}>
-              Use Another Passkey
+              {t('passkey.useAnotherPasskey')}
             </SecondaryButton>
           )}
           {isWeb && !retryOnly && (
@@ -1023,7 +1017,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               setIsNewUser(true);
               setPhase('creating');
             }}>
-              Create New Passkey
+              {t('passkey.createNewPasskey')}
             </SecondaryButton>
           )}
         </div>
@@ -1042,7 +1036,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             setError(null);
             setPhase('aasa-checking');
           }}>
-            Try Again
+            {t('tryAgain')}
           </PrimaryButton>
           {!retryOnly && (
             <SecondaryButton className="w-full" onClick={() => {
@@ -1050,7 +1044,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               setIsNewUser(true);
               setPhase('creating');
             }}>
-              Create Passkey
+              {t('passkey.createPasskey')}
             </SecondaryButton>
           )}
         </div>
@@ -1071,10 +1065,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             detectingFailCountRef.current = 0;
             setPhase('detecting');
           }}>
-            Use Passkey
+            {t('passkey.usePasskey')}
           </PrimaryButton>
           <SecondaryButton className="w-full" onClick={handleErrorBack}>
-            Go Back
+            {t('goBack')}
           </SecondaryButton>
         </div>
       );
@@ -1085,10 +1079,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
       return (
         <div className="max-w-xl mx-auto space-y-3">
           <PrimaryButton className="w-full" onClick={handleRetry}>
-            Retry
+            {t('retry')}
           </PrimaryButton>
           <SecondaryButton className="w-full" onClick={handleErrorBack}>
-            Go Back
+            {t('goBack')}
           </SecondaryButton>
         </div>
       );
@@ -1104,10 +1098,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
             setError(null);
             setPhase('creating');
           }}>
-            Create Passkey
+            {t('passkey.createPasskey')}
           </PrimaryButton>
           <SecondaryButton className="w-full" onClick={onBack}>
-            Go Back
+            {t('goBack')}
           </SecondaryButton>
         </div>
       );
@@ -1155,10 +1149,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               }
             }}
           >
-            Continue
+            {t('continue')}
           </PrimaryButton>
           <SecondaryButton className="w-full" onClick={onBack}>
-            Go Back
+            {t('goBack')}
           </SecondaryButton>
         </div>
       );
@@ -1168,7 +1162,7 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
   })();
 
   return (
-    <PageLayout onBack={onBack} footer={footer} title="Get Started">
+    <PageLayout onBack={onBack} footer={footer} title={t('passkey.getStarted')}>
       <div className="max-w-xl mx-auto w-full flex flex-col min-h-full">
         <div className="mt-6 space-y-4 flex flex-col flex-1">
           {content}
@@ -1177,20 +1171,20 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               variant="error"
               title={
                 errorKind === 'already-exists'
-                  ? 'Passkey already exists'
+                  ? t('passkey.passkeyExists')
                   : errorKind === 'sign-in-cancelled'
-                    ? 'Sign-in cancelled'
+                    ? t('passkey.signInCancelled')
                     : errorKind === 'switch-recovery'
-                      ? 'Passkey unavailable'
+                      ? t('passkey.passkeyUnavailable')
                       : errorKind === 'sign-in-failed'
-                        ? 'Sign-in failed'
+                        ? t('passkey.signInFailed')
                       : phase === 'new-storing'
-                        ? "Couldn't save label"
+                        ? t('passkey.couldNotSaveLabel')
                         : phase === 'connecting'
-                          ? "Couldn't connect"
+                          ? t('passkey.couldNotConnect')
                           : phase === 'creating'
-                            ? "Couldn't create passkey"
-                            : 'Something went wrong'
+                            ? t('passkey.couldNotCreatePasskey')
+                            : t('passkey.somethingWentWrong')
               }
             >
               <p className="text-spark-text-secondary text-sm wrap-break-word">
@@ -1212,10 +1206,10 @@ const PasskeyPage: React.FC<PasskeyPageProps> = ({
               />
               <div className="flex-1 space-y-1">
                 <p className="text-sm text-spark-text-secondary">
-                  I confirm that this passkey was deleted.
+                  {t('passkey.confirmDeleted')}
                 </p>
                 <p className="text-xs text-spark-text-muted">
-                  Optional. Continue without ticking if unsure.
+                  {t('passkey.continueUnsure')}
                 </p>
               </div>
             </div>

@@ -7,6 +7,7 @@ import { CheckIcon, PlusIcon, WalletIcon } from '../components/Icons';
 import { listLabels, saveLabel, getLabelLastUsed } from '../services/passkeyService';
 import { useToast } from '@/contexts/ToastContext';
 import { logger, LogCategory } from '@/services/logger';
+import { t } from '@/services/locale';
 
 interface LabelsPageProps {
   onBack: () => void;
@@ -131,11 +132,11 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
       setLabels((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
       setNewLabel('');
       setShowAddForm(false);
-      showToast('success', 'Label added', `"${trimmed}" is now available on this passkey.`);
+      showToast('success', t('labels.labelAdded'), t('labels.labelAddedMsg', { label: trimmed }));
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       logger.error(LogCategory.AUTH, 'Failed to save label', { error: msg });
-      showToast('error', "Couldn't add label", msg);
+      showToast('error', t('labels.couldNotAdd'), msg);
     } finally {
       setIsSaving(false);
     }
@@ -152,19 +153,19 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       logger.warn(LogCategory.AUTH, 'Label switch failed', { error: msg });
-      showToast('error', "Couldn't switch label", msg);
+      showToast('error', t('labels.couldNotSwitch'), msg);
       setIsSwitching(false);
     }
   };
 
   const footer = !isLoading && loadError ? (
     <PrimaryButton className="w-full" onClick={handleRetry}>
-      Try Again
+      {t('tryAgain')}
     </PrimaryButton>
   ) : undefined;
 
   return (
-    <SlideInPage title="Labels" closeStyle="back" onClose={onBack} slideFrom="right" footer={footer}>
+    <SlideInPage title={t('labels.title')} closeStyle="back" onClose={onBack} slideFrom="right" footer={footer}>
       <div className="p-4 space-y-4">
           {isLoading && (
             <div className="flex items-center justify-center py-12">
@@ -173,7 +174,7 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
           )}
 
           {!isLoading && loadError && (
-            <AlertCard variant="error" title="Couldn't load labels">
+            <AlertCard variant="error" title={t('labels.couldNotLoad')}>
               <p className="text-spark-text-secondary text-sm wrap-break-word">
                 {loadError}
               </p>
@@ -187,10 +188,10 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
                 className="w-14 h-14 text-spark-text-muted opacity-30 mb-4"
               />
               <div className="font-display font-semibold text-spark-text-primary mb-1">
-                No labels yet
+                {t('labels.noLabels')}
               </div>
               <p className="text-spark-text-muted text-sm">
-                Add a label to organize multiple wallets under this passkey.
+                {t('labels.noLabelsDesc')}
               </p>
             </div>
           )}
@@ -208,10 +209,10 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
 
                   const lastUsedTs = lastUsedMap[label];
                   const subtitle = isActive
-                    ? 'Currently signed in'
+                    ? t('labels.currentlySignedIn')
                     : lastUsedTs !== undefined
-                      ? `Last used ${formatRelative(lastUsedTs)}`
-                      : 'Tap to switch';
+                      ? t('labels.lastUsed', { time: formatRelative(lastUsedTs) })
+                      : t('labels.tapToSwitch');
 
                   const inner = (
                     <>
@@ -261,12 +262,12 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
                   className={`w-full flex items-center justify-center gap-2 p-4 bg-spark-dark border border-spark-border rounded-2xl text-spark-text-secondary hover:text-spark-text-primary hover:border-spark-border-light transition-colors ${isSwitching ? 'opacity-50 pointer-events-none' : ''}`}
                 >
                   <PlusIcon size="sm" />
-                  <span className="font-display font-medium">Add new label</span>
+                  <span className="font-display font-medium">{t('labels.addNew')}</span>
                 </button>
               ) : (
                 <div className="bg-spark-dark border border-spark-primary rounded-2xl p-4 space-y-3">
                   <div className="font-display font-semibold text-spark-text-primary">
-                    New label name
+                    {t('labels.newLabelName')}
                   </div>
                   <FormInput
                     id="new-label"
@@ -278,13 +279,13 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
                         setNewLabel(val);
                       }
                     }}
-                    placeholder="e.g. Savings"
+                    placeholder={t('labels.placeholder')}
                     autoFocus
                     disabled={isSaving}
                   />
                   {isDuplicate && (
                     <p className="text-spark-error text-xs">
-                      A label with this name already exists.
+                      {t('labels.duplicate')}
                     </p>
                   )}
                   <div className="flex gap-2">
@@ -296,14 +297,14 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
                       }}
                       disabled={isSaving}
                     >
-                      Cancel
+                      {t('cancel')}
                     </SecondaryButton>
                     <PrimaryButton
                       className="flex-1"
                       onClick={handleSave}
                       disabled={!canSave}
                     >
-                      {isSaving ? 'Saving…' : 'Save'}
+                      {isSaving ? t('labels.saving') : t('labels.save')}
                     </PrimaryButton>
                   </div>
                 </div>
@@ -312,16 +313,16 @@ const LabelsPage: React.FC<LabelsPageProps> = ({ onBack, onSwitchLabel }) => {
           )}
       </div>
 
-      <ConfirmDialog
-        isOpen={pendingSwitch !== null}
-        title="Switch label?"
-        message={
-          pendingSwitch
-            ? `PEGGASUSD will reconnect using "${pendingSwitch}". You'll be asked to authenticate with your passkey.`
-            : ''
-        }
-        confirmLabel="Switch"
-        cancelLabel="Cancel"
+        <ConfirmDialog
+          isOpen={pendingSwitch !== null}
+          title={t('labels.switchTitle')}
+          message={
+            pendingSwitch
+              ? t('labels.switchMsg', { label: pendingSwitch })
+              : ''
+          }
+          confirmLabel={t('labels.switchLabel')}
+          cancelLabel={t('cancel')}
         variant="default"
         onConfirm={handleConfirmSwitch}
         onCancel={() => setPendingSwitch(null)}
