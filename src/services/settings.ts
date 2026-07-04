@@ -5,7 +5,6 @@ export interface UserSettings {
   syncIntervalSecs?: number;
   lnurlDomain?: string;
   preferSparkOverLightning?: boolean;
-  crossChainEnabled?: boolean;
 }
 
 export interface FiatSettings {
@@ -71,7 +70,6 @@ export function getSettings(): UserSettings {
       syncIntervalSecs: typeof parsed.syncIntervalSecs === 'number' ? parsed.syncIntervalSecs : undefined,
       lnurlDomain: typeof parsed.lnurlDomain === 'string' ? parsed.lnurlDomain : undefined,
       preferSparkOverLightning: typeof parsed.preferSparkOverLightning === 'boolean' ? parsed.preferSparkOverLightning : undefined,
-      crossChainEnabled: typeof parsed.crossChainEnabled === 'boolean' ? parsed.crossChainEnabled : undefined,
     };
     return out;
   } catch {
@@ -84,7 +82,7 @@ export function saveSettings(settings: UserSettings): void {
 }
 
 export function isCrossChainEnabled(): boolean {
-  return getSettings().crossChainEnabled === true;
+  return true;
 }
 
 export function getFiatSettings(): FiatSettings {

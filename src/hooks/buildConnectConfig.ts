@@ -25,10 +25,8 @@ export function buildConnectConfig(overrideNetwork?: Network): Config {
 
   // Apply persisted user settings to config
   try {
+    config.crossChainConfig = {};
     const s = getSettings();
-    if (s.crossChainEnabled) {
-      config.crossChainConfig = {};
-    }
     if (s.depositMaxFee) {
       config.maxDepositClaimFee = s.depositMaxFee;
     }
