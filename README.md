@@ -72,7 +72,7 @@ cd android && ./gradlew assembleRelease
 
 ## Security Note
 
-Your recovery phrase is stored in `localStorage`. Any JavaScript running in the same origin (XSS attacks, malicious browser extensions) could potentially access it. For larger amounts, consider additional security measures.
+Your seed is stored in the WebView's `localStorage`, inside the app's private data directory on Android (inaccessible to other apps). Because this is a Capacitor app — not a browser-based PWA — there is no exposure to browser extensions, cross-origin scripts, or third-party sites. The main threat would be a code vulnerability within the app or a compromised device (root/malware). For larger amounts, consider additional security measures.
 
 ## License
 
